@@ -8,7 +8,7 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         Task CreateNewTicketAsync(TicketDTO ticket);
 
-        void DeleteTicket(int id);
+        Task<bool> DeleteTicket(int ticketId);
 
         void UpdateTicket(TicketDTO ticket);
     }

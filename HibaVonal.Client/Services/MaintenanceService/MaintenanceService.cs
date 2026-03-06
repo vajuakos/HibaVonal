@@ -11,13 +11,11 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         private readonly HttpClient _httpClient;
         private readonly ISnackbar _snackbar;
-        private readonly ILocalStorageService _localStorage;
 
-        public MaintenanceService(HttpClient httpClient, ISnackbar snackbar, ILocalStorageService localStorage)
+        public MaintenanceService(HttpClient httpClient, ISnackbar snackbar)
         {
             _httpClient = httpClient;
             _snackbar = snackbar;
-            _localStorage = localStorage;
         }
 
         public async Task<List<TicketDTO>> GetTicketsAsync()
@@ -46,9 +44,23 @@ namespace HibaVonal.Client.Services.MaintenanceService
                 _snackbar.Add("Hiba történt a hiba létrehozásakor.", Severity.Error);
         }
 
-        public void DeleteTicket(int id)
+        public async Task<bool> DeleteTicket(int ticketId)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/delete", ticketId);
+
+            bool result = false;
+
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadFromJsonAsync<bool>();
+            }
+
+            if (result)
+                _snackbar.Add("Hiba sikeresen törölve!", Severity.Success);
+            else
+                _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
+
+            return result;
         }
 
         public void UpdateTicket(TicketDTO ticket)

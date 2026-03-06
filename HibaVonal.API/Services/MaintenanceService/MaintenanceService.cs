@@ -39,9 +39,20 @@ namespace HibaVonal.API.Services.MaintenanceService
             await _context.SaveChangesAsync();
         }
 
-        public void DeleteTicket(int id)
+        public async Task<bool> DeleteTicket(int id)
         {
-            throw new NotImplementedException();
+            var ticket = await _context.MaintenanceTickets.FindAsync(id);
+
+            if (ticket == null)
+            {
+                return false;
+            }
+
+            _context.MaintenanceTickets.Remove(ticket);
+
+            var affectedRows = await _context.SaveChangesAsync();
+
+            return affectedRows > 0;
         }
 
         public void UpdateTicket(TicketDTO ticket)

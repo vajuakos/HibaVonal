@@ -10,6 +10,6 @@ namespace HibaVonal.API.Services.MaintenanceService
 
         public void UpdateTicket(TicketDTO ticket);
 
-        public void DeleteTicket(int id);
+        public Task<bool> DeleteTicket(int id);
     }
 }
