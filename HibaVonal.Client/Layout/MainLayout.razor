@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<style>
+    .background-image {
+        background-image: url('img/background-image.jpg');
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh;
+    }
+</style>
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <NavMenu />
+
+    <MudMainContent Class="background-image" Style="padding-top: 80px !important;">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>

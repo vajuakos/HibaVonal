@@ -1,0 +1,79 @@
+﻿@page "/maintenance/add-ticket"
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+    <MudPaper Class="pa-4" Elevation="3">
+
+        <div class="px-16">
+
+            <MudForm>
+
+                <MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="ma-4">
+
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="ma-4">
+                        <div style="border-bottom: 2px black solid; margin: 4px">
+                            <MudText Typo="Typo.body1">Hibabejelentés</MudText>
+                        </div>
+
+                        <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" />
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem md="10">
+                            <MudTextField T="string"
+                                Label="Címke"
+                                Required="true"
+                                RequiredError="Mező kitöltése kötelező"
+                                Variant="Variant.Outlined"
+                                @bind-Value="ticket.Title" />
+                        </MudItem>
+                        <MudItem md="2">
+                            <MudNumericField
+                                Label="Szobaszám"
+                                Required="true"
+                                RequiredError="Mező kitöltése kötelező"
+                                Variant="Variant.Outlined"
+                                @bind-Value="ticket.RoomNumber" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudGrid>
+                        <MudItem md="12">
+                            <MudTextField T="string"
+                                Label="Leírás"
+                                Required="true"
+                                RequiredError="Mező kitöltése kötelező"
+                                Variant="Variant.Outlined"
+                                Lines="8"
+                                @bind-Value="ticket.Description" />
+                        </MudItem>
+                    </MudGrid>
+
+                </MudStack>
+
+                <div class="d-flex align-center justify-space-between">
+                    <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        Class="ml-auto"
+                        OnClick="HandleSubmit">
+                        Beküldés
+                    </MudButton>
+                </div>
+
+            </MudForm>
+
+        </div>
+
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+
+    TicketDTO ticket = new();
+
+    void HandleSubmit()
+    {
+        MaintenanceService.CreateNewTicketAsync(ticket);
+    }
+}

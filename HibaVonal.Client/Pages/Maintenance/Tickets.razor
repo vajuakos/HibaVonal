@@ -1,0 +1,79 @@
+﻿@page "/maintenance/tickets"
+@attribute [Authorize]
+
+<PageTitle>Hibabejelentő</PageTitle>
+
+<style>
+    .glass-card {
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px) saturate(180%);
+        -webkit-backdrop-filter: blur(10px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+</style>
+
+<MudPaper>
+
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="ma-4">Kollégiumi hibabejelentő</MudText>
+
+        <MudButton Variant="Variant.Outlined"
+            StartIcon="@Icons.Material.Filled.Add"
+            Color="Color.Primary"
+            Class="ma-4"
+            OnClick="HandleCreateTicket">
+            Bejelentés
+        </MudButton>
+    </MudStack>
+
+</MudPaper>
+
+<MudGrid Spacing="4" Justify="Justify.Center">
+    @foreach (var ticket in tickets)
+    {
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="mt-4" Style="height: 200px; overflow:hidden">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.subtitle2"
+                                     Color="Color.Primary"
+                                     Style="font-weight: bold">
+                                #@ticket.Id
+                            </MudText>
+
+                            <MudText Typo="Typo.subtitle2">@ticket.Title</MudText>
+                        </MudStack>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText>@ticket.Description</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" />
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Inject] IMaintenanceService MaintenanceService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    List<TicketDTO> tickets = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        tickets = await MaintenanceService.GetTicketsAsync();
+    }
+
+    private void HandleCreateTicket()
+    {
+        NavigationManager.NavigateTo("/maintenance/add-ticket");
+    }
+}

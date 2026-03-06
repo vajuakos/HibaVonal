@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "HibaVonal.API\\HibaVonal.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "HibaVonal.Client\\HibaVonal.Client.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

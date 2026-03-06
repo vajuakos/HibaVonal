@@ -1,0 +1,54 @@
+﻿<MudAppBar Elevation="1" Fixed="true" Color="Color.Primary">
+    <div @onclick="NavigateToHome" class="d-flex align-items-center">
+        <MudImage Src="img/logo.png" Alt="HibaVonal Logo" Width="40" Class="mr-3" />
+        <MudText Typo="Typo.h5" Class="mr-8">HibaVonal</MudText>
+    </div>
+
+    <AuthorizeView>
+        <Authorized>
+            <MudButton href="maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
+            <MudButton href="/maintenance" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
+            <MudButton href="/users" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Felhasználók</MudButton>
+        </Authorized>
+    </AuthorizeView>
+
+    <MudSpacer />
+
+    <AuthorizeView>
+        <Authorized>
+            <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                <ActivatorContent>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Person" Color="Color.Secondary" Class="px-4">
+                        Felhasználó
+                    </MudChip>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Filled.ExitToApp" OnClick="Logout">Kijelentkezés</MudMenuItem>
+                    <MudDivider />
+                </ChildContent>
+            </MudMenu>
+        </Authorized>
+        <NotAuthorized>
+            <MudButton href="/auth/login" Variant="Variant.Outlined" Color="Color.Inherit">Belépés</MudButton>
+        </NotAuthorized>
+    </AuthorizeView>
+
+</MudAppBar>
+
+@code{
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
+
+    private async Task NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task Logout()
+    {
+        var customAuthProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await customAuthProvider.NotifyUserLogoutAsync();
+
+        NavigationManager.NavigateTo("/");
+    }
+}

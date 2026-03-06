@@ -1,0 +1,63 @@
+﻿@page "/auth/login"
+@attribute [AllowAnonymous]
+
+<PageTitle> Bejelentkezés </PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    
+    <MudPaper Class="pa-4" Elevation="3">
+        
+        <div class="px-16">
+
+            <MudText Align="Align.Center" Typo="Typo.h5" Class="pb-4">Bejelentkezés</MudText>
+
+            <MudForm>
+
+                <MudTextField T="string"
+                              @bind-Value="@loginDTO.Email"
+                              Label="Email"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Email magadása kötelező!" />
+
+                <MudTextField T="string"
+                              @bind-Value="@loginDTO.Password"
+                              Label="Jelszó"
+                              Variant="Variant.Outlined"
+                              RequiredError="Jelszó magadása kötelező!"
+                              InputType="InputType.Password"
+                              Required="true" />
+
+                <div class="d-flex justify-content-end pt-4">
+
+                    <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        @onclick="handleLogin">
+                        Bejelentkezés
+                    </MudButton>
+
+                </div>
+
+            </MudForm>
+
+        </div>
+
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] IAuthService AuthService { get; set; } = default!;
+
+    private LoginRequestDTO loginDTO = new();
+
+    async Task handleLogin()
+    {
+        var response = await AuthService.LoginAsync(loginDTO);
+
+        if (response.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}
