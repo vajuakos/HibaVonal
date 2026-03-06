@@ -15,7 +15,7 @@
     }
 </style>
 
-<MudPaper>
+<MudPaper Class="mb-4">
 
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
         <MudText Typo="Typo.h5" Align="Align.Center" Class="ma-4">Kollégiumi hibabejelentő</MudText>
@@ -31,33 +31,47 @@
 
 </MudPaper>
 
-<MudGrid Spacing="4" Justify="Justify.Center">
-    @foreach (var ticket in tickets)
+<MudGrid Justify="Justify.Center">
+    @if (tickets.Count == 0)
     {
-        <MudItem xs="12" sm="6" md="4" lg="3">
-            <MudCard Elevation="3" Class="mt-4" Style="height: 200px; overflow:hidden">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
-                            <MudText Typo="Typo.subtitle2"
-                                     Color="Color.Primary"
-                                     Style="font-weight: bold">
-                                #@ticket.Id
-                            </MudText>
-
-                            <MudText Typo="Typo.subtitle2">@ticket.Title</MudText>
-                        </MudStack>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText>@ticket.Description</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
-                    <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" />
-                </MudCardActions>
-            </MudCard>
+        <MudItem md="4">
+            <MudPaper Class="pa-4">
+                <MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error" />
+                    <MudText>Nincs rögzített hibajegy!</MudText>
+                </MudStack>
+            </MudPaper>
         </MudItem>
+    }
+    else
+    {
+        @foreach (var ticket in tickets)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudCard Elevation="3" Class="mt-4" Style="height: 200px; overflow:hidden">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.subtitle2"
+                                         Color="Color.Primary"
+                                         Style="font-weight: bold">
+                                    #@ticket.Id
+                                </MudText>
+
+                                <MudText Typo="Typo.subtitle2">@ticket.Title</MudText>
+                            </MudStack>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>@ticket.Description</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                        <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
     }
 </MudGrid>
 
@@ -75,5 +89,20 @@
     private void HandleCreateTicket()
     {
         NavigationManager.NavigateTo("/maintenance/add-ticket");
+    }
+
+    private async Task DeleteTicket(int tickedId)
+    {
+        var isDeleted = await MaintenanceService.DeleteTicket(tickedId);
+
+        if (isDeleted)
+        {
+            var ticketToRemove = tickets.FirstOrDefault(t => t.Id == tickedId);
+            if (ticketToRemove != null)
+            {
+                tickets.Remove(ticketToRemove);
+                StateHasChanged();
+            }
+        }
     }
 }

@@ -29,5 +29,11 @@ namespace HibaVonal.API.Controllers
         {
             _maintenanceService.AddTicket(ticket, CurrentUserId);
         }
+
+        [HttpPost("tickets/delete")]
+        public async Task<bool> DeleteTicket([FromBody] int ticketId)
+        {
+            return await _maintenanceService.DeleteTicket(ticketId);
+        }
     }
 }
