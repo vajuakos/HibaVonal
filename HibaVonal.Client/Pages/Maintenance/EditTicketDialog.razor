@@ -1,0 +1,70 @@
+﻿<div class="ma-4">
+    <MudForm @ref="_editMudForm">
+
+        <MudGrid>
+            <MudItem md="10">
+                <MudTextField T="string"
+                    Label="Címke"
+                    Required="true"
+                    RequiredError="Mező kitöltése kötelező"
+                    Variant="Variant.Outlined"
+                    @bind-Value="Ticket.Title" />
+            </MudItem>
+            <MudItem md="2">
+                <MudNumericField Label="Szobaszám"
+                    Required="true"
+                    RequiredError="Mező kitöltése kötelező"
+                    Variant="Variant.Outlined"
+                    @bind-Value="Ticket.RoomNumber" />
+            </MudItem>
+        </MudGrid>
+
+        <MudTextField T="string"
+            Label="Leírás"
+            Required="true"
+            RequiredError="Mező kitöltése kötelező"
+            Variant="Variant.Outlined"
+            Lines="8"
+            @bind-Value="Ticket.Description" />
+
+        <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined"
+                Color="Color.Secondary"
+                OnClick="Cancel">
+                Mégse
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined"
+                Color="Color.Primary"
+                StartIcon="@Icons.Material.Filled.Save"
+                OnClick="HandleSubmit">
+                Mentés
+            </MudButton>
+        </MudStack>
+
+    </MudForm>
+</div>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+
+    [Parameter] public TicketDTO Ticket { get; set; } = new();
+
+    MudForm _editMudForm;
+
+    void HandleSubmit()
+    {
+        _editMudForm.Validate();
+
+        if (_editMudForm.IsValid)
+        {
+            MaintenanceService.UpdateTicket(Ticket);
+
+            MudDialog.Close(DialogResult.Ok(Ticket));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

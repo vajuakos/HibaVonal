@@ -44,6 +44,25 @@ namespace HibaVonal.Client.Services.MaintenanceService
                 _snackbar.Add("Hiba történt a hiba létrehozásakor.", Severity.Error);
         }
 
+        public async Task<bool> UpdateTicket(TicketDTO ticket)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/tickets/update", ticket);
+
+            bool result = false;
+
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadFromJsonAsync<bool>();
+            }
+
+            if (result)
+                _snackbar.Add("Hiba sikeresen törölve!", Severity.Success);
+            else
+                _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
+
+            return result;
+        }
+
         public async Task<bool> DeleteTicket(int ticketId)
         {
             var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/delete", ticketId);
@@ -61,11 +80,6 @@ namespace HibaVonal.Client.Services.MaintenanceService
                 _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
 
             return result;
-        }
-
-        public void UpdateTicket(TicketDTO ticket)
-        {
-            throw new NotImplementedException();
         }
     }
 }

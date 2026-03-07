@@ -13,6 +13,10 @@
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         border-radius: 10px;
     }
+
+    .blurry {
+        backdrop-filter: blur(10px);
+    }
 </style>
 
 <MudPaper Class="mb-4">
@@ -66,7 +70,7 @@
                         <MudText>@ticket.Description</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => UpdateTicket(ticket))" />
                         <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
                     </MudCardActions>
                 </MudCard>
@@ -78,6 +82,7 @@
 @code {
     [Inject] IMaintenanceService MaintenanceService { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
 
     List<TicketDTO> tickets = new();
 
@@ -89,6 +94,40 @@
     private void HandleCreateTicket()
     {
         NavigationManager.NavigateTo("/maintenance/add-ticket");
+    }
+
+    private async Task UpdateTicket(TicketDTO ticketDTO)
+    {
+        var options = new DialogOptions
+        {
+            BackgroundClass = "blurry",
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true
+        };
+
+        var parameters = new DialogParameters<EditTicketDialog> { { x => x.Ticket, ticketDTO } };
+
+        var dialog = await DialogService.ShowAsync<EditTicketDialog>("Hibajegy szerkesztés", parameters, options);
+        
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled && result.Data is TicketDTO updatedTicket)
+        {
+            var success = await MaintenanceService.UpdateTicket(updatedTicket);
+
+            if (success)
+            {
+                var index = tickets.FindIndex(t => t.Id == updatedTicket.Id);
+
+                if (index != -1)
+                {
+                    tickets[index] = updatedTicket;
+
+                    StateHasChanged();
+                }
+            }
+        }
     }
 
     private async Task DeleteTicket(int tickedId)
