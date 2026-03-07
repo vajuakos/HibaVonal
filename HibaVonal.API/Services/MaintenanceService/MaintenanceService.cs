@@ -39,6 +39,24 @@ namespace HibaVonal.API.Services.MaintenanceService
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> UpdateTicket(TicketDTO ticketDto, int currentUserId)
+        {
+            var existingTicket = await _context.MaintenanceTickets
+                .FirstOrDefaultAsync(t => t.Id == ticketDto.Id);
+
+            if (existingTicket == null) return false;
+
+            if (existingTicket.CreatedById != currentUserId) return false;
+
+            existingTicket.Title = ticketDto.Title;
+            existingTicket.Description = ticketDto.Description;
+            existingTicket.RoomNumber = ticketDto.RoomNumber;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> DeleteTicket(int id)
         {
             var ticket = await _context.MaintenanceTickets.FindAsync(id);
@@ -53,11 +71,6 @@ namespace HibaVonal.API.Services.MaintenanceService
             var affectedRows = await _context.SaveChangesAsync();
 
             return affectedRows > 0;
-        }
-
-        public void UpdateTicket(TicketDTO ticket)
-        {
-            throw new NotImplementedException();
         }
     }
 }
