@@ -2,78 +2,64 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium">
 
-    <MudPaper Class="pa-4" Elevation="3">
+    <MudPaper Elevation="3">
 
-        <div class="px-16">
+        <MudForm @ref="_addForm">
+            <MudStack Class="ma-4">
 
-            <MudForm>
-
-                <MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="ma-4">
-
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="ma-4">
-                        <div style="border-bottom: 2px black solid; margin: 4px">
-                            <MudText Typo="Typo.body1">Hibabejelentés</MudText>
-                        </div>
-
-                        <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" />
-                    </MudStack>
-
-                    <MudGrid>
-                        <MudItem md="10">
-                            <MudTextField T="string"
-                                Label="Címke"
-                                Required="true"
-                                RequiredError="Mező kitöltése kötelező"
-                                Variant="Variant.Outlined"
-                                @bind-Value="ticket.Title" />
-                        </MudItem>
-                        <MudItem md="2">
-                            <MudNumericField
-                                Label="Szobaszám"
-                                Required="true"
-                                RequiredError="Mező kitöltése kötelező"
-                                Variant="Variant.Outlined"
-                                @bind-Value="ticket.RoomNumber" />
-                        </MudItem>
-                    </MudGrid>
-
-                    <MudGrid>
-                        <MudItem md="12">
-                            <MudTextField T="string"
-                                Label="Leírás"
-                                Required="true"
-                                RequiredError="Mező kitöltése kötelező"
-                                Variant="Variant.Outlined"
-                                Lines="8"
-                                @bind-Value="ticket.Description" />
-                        </MudItem>
-                    </MudGrid>
-
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <div style="border-bottom: 2px black solid;">
+                        <MudText Typo="Typo.h6">Hibabejelentés</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" />
                 </MudStack>
 
-                <div class="d-flex align-center justify-space-between">
-                    <MudButton Variant="Variant.Filled"
-                        Color="Color.Primary"
-                        Class="ml-auto"
-                        OnClick="HandleSubmit">
-                        Beküldés
+                <MudGrid>
+                    <MudItem xs="12" md="10">
+                        <MudTextField @bind-Value="ticket.Title" Label="Címke" Variant="Variant.Outlined" FullWidth="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="2">
+                        <MudNumericField @bind-Value="ticket.RoomNumber" Label="Szobaszám" Variant="Variant.Outlined" FullWidth="true" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudTextField T="string"
+                    Label="Leírás"
+                    Variant="Variant.Outlined"
+                    Lines="8"
+                    @bind-Value="ticket.Description" />
+
+                <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               OnClick="HandleSubmit">
+                        Mentés
                     </MudButton>
-                </div>
+                </MudStack>
 
-            </MudForm>
+            </MudStack>
 
-        </div>
+        </MudForm>
 
     </MudPaper>
 </MudContainer>
 
 @code {
+    [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
 
+    MudForm _addForm;
     TicketDTO ticket = new();
 
-    void HandleSubmit()
+    async Task HandleSubmit()
     {
-        MaintenanceService.CreateNewTicketAsync(ticket);
+        await _addForm.Validate();
+
+        if (_addForm.IsValid)
+        {
+            await MaintenanceService.CreateNewTicketAsync(ticket);
+            NavigationManager.NavigateTo("/maintenance/tickets");
+        }
     }
 }

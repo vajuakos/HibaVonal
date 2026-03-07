@@ -70,8 +70,12 @@
                         <MudText>@ticket.Description</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => UpdateTicket(ticket))" />
-                        <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
+                        <MudTooltip Text="Szerkesztés">
+                            <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => UpdateTicket(ticket))" />
+                        </MudTooltip>
+                        <MudTooltip Text="Törlés">
+                            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
+                        </MudTooltip>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
