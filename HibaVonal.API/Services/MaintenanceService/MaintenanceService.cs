@@ -24,6 +24,7 @@ namespace HibaVonal.API.Services.MaintenanceService
                     Id = t.Id,
                     Title = t.Title,
                     Description = t.Description,
+                    RoomNumber = t.RoomNumber,
                     Status = t.Status,
                     CreatedAt = t.CreatedAt
                 })
