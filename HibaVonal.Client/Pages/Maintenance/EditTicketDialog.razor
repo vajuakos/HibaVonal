@@ -54,15 +54,18 @@
 
     MudForm _editMudForm;
 
-    void HandleSubmit()
+    async Task HandleSubmit()
     {
-        _editMudForm.Validate();
+        await _editMudForm.Validate();
 
         if (_editMudForm.IsValid)
         {
-            MaintenanceService.UpdateTicket(Ticket);
+            var dialogResult = await MaintenanceService.UpdateTicket(Ticket);
 
-            MudDialog.Close(DialogResult.Ok(Ticket));
+            if (dialogResult)
+            {
+                MudDialog.Close(DialogResult.Ok(Ticket));
+            }
         }
     }
 
