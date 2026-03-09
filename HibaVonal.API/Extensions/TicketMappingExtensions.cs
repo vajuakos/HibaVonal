@@ -1,6 +1,7 @@
 ﻿using HibaVonal.API.Models;
 using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.Enum;
 
 namespace HibaVonal.API.Extensions
 {
@@ -13,7 +14,7 @@ namespace HibaVonal.API.Extensions
                 Title = dto.Title,
                 Description = dto.Description,
                 RoomNumber = dto.RoomNumber,
-                Status = "New",
+                Status = TicketStatus.New,
                 CreatedAt = DateTime.Now,
                 CreatedById = currentUserId,
                 AssignedToId = null

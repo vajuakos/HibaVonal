@@ -14,7 +14,7 @@ namespace HibaVonal.API.Data
 
         public DbSet<TicketComment> Comments { get; set; }
 
-        public DbSet<TicketReview> Reviews { get; set; }
+        public DbSet<TicketFeedback> Feedbacks { get; set; }
 
         override protected void OnModelCreating(ModelBuilder builder)
         {
@@ -46,11 +46,11 @@ namespace HibaVonal.API.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            builder.Entity<TicketReview>(entity =>
+            builder.Entity<TicketFeedback>(entity =>
             {
                 entity.HasOne(r => r.Ticket)
                       .WithOne(t => t.Review)
-                      .HasForeignKey<TicketReview>(r => r.TicketId)
+                      .HasForeignKey<TicketFeedback>(r => r.TicketId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

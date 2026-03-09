@@ -1,4 +1,6 @@
-﻿namespace HibaVonal.API.Models.Ticket
+﻿using HibaVonal.Shared.Enum;
+
+namespace HibaVonal.API.Models.Ticket
 {
     public class MaintenanceTicket
     {
@@ -12,7 +14,7 @@
 
         public DateTime CreatedAt { get; set; }
 
-        public string? Status { get; set; }
+        public TicketStatus Status { get; set; }
 
         public int? AssignedToId { get; set; }
 
@@ -26,7 +28,7 @@
 
         public int? ReviewId { get; set; }
 
-        public TicketReview? Review { get; set; }
+        public TicketFeedback? Review { get; set; }
 
     }
 }

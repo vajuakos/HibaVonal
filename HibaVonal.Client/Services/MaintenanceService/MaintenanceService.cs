@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using HibaVonal.Shared.DTO;
+﻿using HibaVonal.Shared.DTO;
 using MudBlazor;
 using System.Net.Http.Json;
 
@@ -18,11 +17,11 @@ namespace HibaVonal.Client.Services.MaintenanceService
             _snackbar = snackbar;
         }
 
-        public async Task<List<TicketDTO>> GetTicketsAsync()
+        public async Task<List<TicketDTO>> GetTicketsAsync(bool isCompletedTickets)
         {
             try
             {
-                var tickets = await _httpClient.GetFromJsonAsync<List<TicketDTO>>($"{BaseUrl}/tickets/all");
+                var tickets = await _httpClient.GetFromJsonAsync<List<TicketDTO>>($"{BaseUrl}/tickets?isCompleted={isCompletedTickets}");
 
                 return tickets ?? new();
             }
@@ -78,6 +77,20 @@ namespace HibaVonal.Client.Services.MaintenanceService
                 _snackbar.Add("Hiba sikeresen törölve!", Severity.Success);
             else
                 _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
+
+            return result;
+        }
+
+        public async Task<bool> RateTicket(TicketDTO ticket)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/{ticket.Id}/feedback", ticket);
+
+            bool result = false;
+
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadFromJsonAsync<bool>();
+            }
 
             return result;
         }

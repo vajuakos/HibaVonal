@@ -22,7 +22,15 @@
 <MudPaper Class="mb-4">
 
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-        <MudText Typo="Typo.h5" Align="Align.Center" Class="ma-4">Kollégiumi hibabejelentő</MudText>
+        <MudStack Row="true" AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.h5" Align="Align.Center" Class="ma-4">Kollégiumi hibabejelentő</MudText>
+            <MudSwitch T="bool"
+                Value="isCompletedTicketsShowing"
+                ValueChanged="OnSwitchChanged"
+                ThumbIcon="@(isCompletedTicketsShowing ? Icons.Material.Filled.DoneAll : @Icons.Material.Filled.HomeRepairService)"
+                Label="@(isCompletedTicketsShowing ? "Elvégzett" : "Folyamatban")"
+                Color="Color.Primary" />
+        </MudStack>
 
         <MudButton Variant="Variant.Outlined"
             StartIcon="@Icons.Material.Filled.Add"
@@ -63,6 +71,8 @@
                                 </MudText>
 
                                 <MudText Typo="Typo.subtitle2">@ticket.Title</MudText>
+
+                                <MudChip T="string">@TicketStatusExtensions.ToDisplayString(ticket.Status)</MudChip>
                             </MudStack>
                         </CardHeaderContent>
                     </MudCardHeader>
@@ -70,12 +80,29 @@
                         <MudText>@ticket.Description</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudTooltip Text="Szerkesztés">
-                            <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => UpdateTicket(ticket))" />
-                        </MudTooltip>
-                        <MudTooltip Text="Törlés">
-                            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
-                        </MudTooltip>
+                        @if (ticket.Status != TicketStatus.Resolved)
+                        {
+                            <MudTooltip Text="Szerkesztés">
+                                <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => UpdateTicket(ticket))" />
+                            </MudTooltip>
+                            <MudTooltip Text="Törlés">
+                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
+                            </MudTooltip>
+                        }
+                        else
+                        {
+                            <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                                <ActivatorContent>
+                                    <MudIconButton Icon="@Icons.Material.Filled.StarHalf" />
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <div class="d-flex flex-column align-center">
+                                        <MudRating SelectedValue="ticket.Rating ?? 0" SelectedValueChanged="@((value) => RateTicket(ticket, value))" />
+                                        <MudText Typo="Typo.subtitle2" Class="deep-purple-text ma-2">Értékeld a munkánkat!</MudText>
+                                    </div>
+                                </ChildContent>
+                            </MudMenu>
+                        }
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -89,10 +116,17 @@
     [Inject] IDialogService DialogService { get; set; }
 
     List<TicketDTO> tickets = new();
+    bool isCompletedTicketsShowing = false;
 
     protected override async Task OnInitializedAsync()
     {
-        tickets = await MaintenanceService.GetTicketsAsync();
+        tickets = await MaintenanceService.GetTicketsAsync(isCompletedTicketsShowing);
+    }
+
+    private async Task OnSwitchChanged(bool newValue)
+    {
+        isCompletedTicketsShowing = newValue;
+        tickets = await MaintenanceService.GetTicketsAsync(isCompletedTicketsShowing);
     }
 
     private void HandleCreateTicket()
@@ -147,5 +181,33 @@
                 StateHasChanged();
             }
         }
+    }
+
+    private async Task RateTicket(TicketDTO ticketDTO, int ratingValue)
+    {
+        ticketDTO.Rating = ratingValue;
+
+        var options = new DialogOptions
+        {
+            BackgroundClass = "blurry",
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var parameters = new DialogParameters<RateTicketDialog> { { x => x.Ticket, ticketDTO } };
+
+        await DialogService.ShowAsync<RateTicketDialog>("Értékelés", parameters, options);
+
+        // var success = await MaintenanceService.UpdateTicket(ticketDTO);
+        // if (success)
+        // {
+        //     var index = tickets.FindIndex(t => t.Id == ticketDTO.Id);
+        //     if (index != -1)
+        //     {
+        //         tickets[index] = ticketDTO;
+        //         StateHasChanged();
+        //     }
+        // }
     }
 }
