@@ -18,10 +18,10 @@ namespace HibaVonal.API.Controllers
             _maintenanceService = maintenanceService;
         }
 
-        [HttpGet("tickets/all")]
-        public Task<List<TicketDTO>> GetAllTickets()
+        [HttpGet("tickets")]
+        public Task<List<TicketDTO>> GetTickets([FromQuery] bool isCompleted)
         {
-            return _maintenanceService.GetAllTickets(CurrentUserId);
+            return _maintenanceService.GetTickets(CurrentUserId, isCompleted);
         }
 
         [HttpPut("tickets/create")]
@@ -40,6 +40,12 @@ namespace HibaVonal.API.Controllers
         public async Task<bool> DeleteTicket([FromBody] int ticketId)
         {
             return await _maintenanceService.DeleteTicket(ticketId);
+        }
+
+        [HttpPost("tickets/{ticketId}/feedback")]
+        public async Task<bool> SubmitFeedback(int ticketId, TicketDTO ticket)
+        {
+            return await _maintenanceService.SubmitFeedback(ticketId, ticket, CurrentUserId);
         }
     }
 }

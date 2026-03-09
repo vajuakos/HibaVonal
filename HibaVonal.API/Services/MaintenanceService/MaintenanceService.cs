@@ -1,6 +1,8 @@
 ﻿using HibaVonal.API.Data;
 using HibaVonal.API.Extensions;
+using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace HibaVonal.API.Services.MaintenanceService
@@ -14,11 +16,18 @@ namespace HibaVonal.API.Services.MaintenanceService
             _context = context;
         }
 
-        public async Task<List<TicketDTO>> GetAllTickets(int currentUserId)
+        public async Task<List<TicketDTO>> GetTickets(int currentUserId, bool isCompleted)
         {
-            return await _context.MaintenanceTickets
+            var query = _context.MaintenanceTickets
                 .AsNoTracking()
-                .Where(t => t.CreatedById == currentUserId)
+                .Where(t => t.CreatedById == currentUserId);
+
+            if (isCompleted)
+                query = query.Where(t => t.Status == TicketStatus.Resolved);
+            else
+                query = query.Where(t => t.Status != TicketStatus.Resolved);
+
+            return await query
                 .Select(t => new TicketDTO
                 {
                     Id = t.Id,
@@ -26,7 +35,17 @@ namespace HibaVonal.API.Services.MaintenanceService
                     Description = t.Description,
                     RoomNumber = t.RoomNumber,
                     Status = t.Status,
-                    CreatedAt = t.CreatedAt
+                    CreatedAt = t.CreatedAt,
+
+                    Rating = _context.Feedbacks
+                        .Where(f => f.TicketId == t.Id)
+                        .Select(f => (int?)f.Rating)
+                        .FirstOrDefault(),
+
+                    RatingComment = _context.Feedbacks
+                        .Where(f => f.TicketId == t.Id)
+                        .Select(f => f.FeedbackComment)
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
         }
@@ -72,6 +91,34 @@ namespace HibaVonal.API.Services.MaintenanceService
             var affectedRows = await _context.SaveChangesAsync();
 
             return affectedRows > 0;
+        }
+
+        public async Task<bool> SubmitFeedback(int ticketId, TicketDTO ticketDto, int currentUserId)
+        {
+            var ticketExists = await _context.MaintenanceTickets
+                .AnyAsync(t => t.Id == ticketId && t.CreatedById == currentUserId);
+
+            if (!ticketExists) return false;
+
+            var alreadyRated = await _context.Feedbacks
+                .AnyAsync(f => f.TicketId == ticketId);
+
+            if (alreadyRated) return false;
+
+            var newFeedback = new TicketFeedback
+            {
+                TicketId = ticketId,
+                Rating = ticketDto.Rating ?? 0,
+                FeedbackComment = ticketDto.RatingComment,
+                CreatedAt = DateTime.Now,
+                FeedbackerId = currentUserId
+            };
+
+            _context.Feedbacks.Add(newFeedback);
+
+            var count = await _context.SaveChangesAsync();
+
+            return count > 0;
         }
     }
 }

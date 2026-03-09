@@ -1,4 +1,6 @@
-﻿namespace HibaVonal.Shared.DTO
+﻿using HibaVonal.Shared.Enum;
+
+namespace HibaVonal.Shared.DTO
 {
     public class TicketDTO
     {
@@ -10,7 +12,11 @@
 
         public int RoomNumber { get; set; }
 
-        public string Status { get; set; }
+        public TicketStatus Status { get; set; }
+
+        public int? Rating { get; set; }
+
+        public string RatingComment { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

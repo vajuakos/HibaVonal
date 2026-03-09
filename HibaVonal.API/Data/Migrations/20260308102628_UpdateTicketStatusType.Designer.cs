@@ -3,6 +3,7 @@ using System;
 using HibaVonal.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HibaVonal.API.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260308102628_UpdateTicketStatusType")]
+    partial class UpdateTicketStatusType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.24");
@@ -146,22 +149,16 @@ namespace HibaVonal.API.Data.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("HibaVonal.API.Models.Ticket.TicketFeedback", b =>
+            modelBuilder.Entity("HibaVonal.API.Models.Ticket.TicketReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FeedbackComment")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("FeedbackerId")
+                    b.Property<int>("Rating")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Rating")
+                    b.Property<int?>("ReviewerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TicketId")
@@ -169,12 +166,12 @@ namespace HibaVonal.API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FeedbackerId");
+                    b.HasIndex("ReviewerId");
 
                     b.HasIndex("TicketId")
                         .IsUnique();
 
-                    b.ToTable("Feedbacks");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -332,19 +329,19 @@ namespace HibaVonal.API.Data.Migrations
                     b.Navigation("Ticket");
                 });
 
-            modelBuilder.Entity("HibaVonal.API.Models.Ticket.TicketFeedback", b =>
+            modelBuilder.Entity("HibaVonal.API.Models.Ticket.TicketReview", b =>
                 {
-                    b.HasOne("HibaVonal.API.Models.AppUser", "Feedbacker")
+                    b.HasOne("HibaVonal.API.Models.AppUser", "Reviewer")
                         .WithMany()
-                        .HasForeignKey("FeedbackerId");
+                        .HasForeignKey("ReviewerId");
 
                     b.HasOne("HibaVonal.API.Models.Ticket.MaintenanceTicket", "Ticket")
                         .WithOne("Review")
-                        .HasForeignKey("HibaVonal.API.Models.Ticket.TicketFeedback", "TicketId")
+                        .HasForeignKey("HibaVonal.API.Models.Ticket.TicketReview", "TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Feedbacker");
+                    b.Navigation("Reviewer");
 
                     b.Navigation("Ticket");
                 });
