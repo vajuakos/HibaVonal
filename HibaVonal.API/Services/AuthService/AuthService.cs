@@ -10,8 +10,8 @@ namespace HibaVonal.API.Services.AuthService
 {
     public class AuthService : IAuthService
     {
-        private UserManager<AppUser> _userManager;
-        private IConfiguration _configuration;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public AuthService(UserManager<AppUser> userManager, IConfiguration configuration)
         {
@@ -29,10 +29,10 @@ namespace HibaVonal.API.Services.AuthService
 
             if (!result) return new LoginResponseDTO { IsSuccess = false };
 
-            return new LoginResponseDTO { IsSuccess = true, Token = GenerateToken(user) };
+            return new LoginResponseDTO { IsSuccess = true, Token = await GenerateToken(user) };
         }
 
-        public string GenerateToken(AppUser user)
+        public async Task<string> GenerateToken(AppUser user)
         {
             var key = _configuration["JWT:Key"] ?? throw new InvalidOperationException("JWT Key is not configured.");
 
@@ -45,11 +45,17 @@ namespace HibaVonal.API.Services.AuthService
                 new(ClaimTypes.Email, user.Email!),
             };
 
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: credentials
             );
 
