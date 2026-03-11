@@ -19,31 +19,31 @@ namespace HibaVonal.API.Controllers
         }
 
         [HttpGet("tickets")]
-        public Task<List<TicketDTO>> GetTickets([FromQuery] bool isCompleted)
+        public Task<ServiceResponse<List<TicketDTO>>> GetTickets([FromQuery] bool isCompleted)
         {
             return _maintenanceService.GetTickets(CurrentUserId, isCompleted);
         }
 
-        [HttpPut("tickets/create")]
-        public void CreateTicket(TicketDTO ticket)
+        [HttpPost("tickets")]
+        public async Task<ServiceResponse<bool>> CreateTicket(TicketDTO ticket)
         {
-            _maintenanceService.AddTicket(ticket, CurrentUserId);
+            return await _maintenanceService.AddTicket(ticket, CurrentUserId);
         }
 
-        [HttpPut("tickets/update")]
-        public async Task<bool> UpdateTicket(TicketDTO ticket)
+        [HttpPut("tickets/{ticketId}")]
+        public async Task<ServiceResponse<bool>> UpdateTicket(int ticketId, TicketDTO ticket)
         {
-            return await _maintenanceService.UpdateTicket(ticket, CurrentUserId);
+            return await _maintenanceService.UpdateTicket(ticketId, ticket, CurrentUserId);
         }
 
-        [HttpPost("tickets/delete")]
-        public async Task<bool> DeleteTicket([FromBody] int ticketId)
+        [HttpDelete("tickets/{ticketId}")]
+        public async Task<ServiceResponse<bool>> DeleteTicket(int ticketId)
         {
-            return await _maintenanceService.DeleteTicket(ticketId);
+            return await _maintenanceService.DeleteTicket(ticketId, CurrentUserId);
         }
 
         [HttpPost("tickets/{ticketId}/feedback")]
-        public async Task<bool> SubmitFeedback(int ticketId, TicketDTO ticket)
+        public async Task<ServiceResponse<bool>> SubmitFeedback(int ticketId, TicketDTO ticket)
         {
             return await _maintenanceService.SubmitFeedback(ticketId, ticket, CurrentUserId);
         }

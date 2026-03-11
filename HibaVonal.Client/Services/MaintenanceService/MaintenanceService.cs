@@ -9,87 +9,78 @@ namespace HibaVonal.Client.Services.MaintenanceService
         private const string BaseUrl = "api/maintenance";
 
         private readonly HttpClient _httpClient;
-        private readonly ISnackbar _snackbar;
 
-        public MaintenanceService(HttpClient httpClient, ISnackbar snackbar)
+        public MaintenanceService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _snackbar = snackbar;
         }
 
-        public async Task<List<TicketDTO>> GetTicketsAsync(bool isCompletedTickets)
+        public async Task<ServiceResponse<List<TicketDTO>>> GetTicketsAsync(bool isCompletedTickets)
         {
             try
             {
-                var tickets = await _httpClient.GetFromJsonAsync<List<TicketDTO>>($"{BaseUrl}/tickets?isCompleted={isCompletedTickets}");
+                var tickets = await _httpClient.GetFromJsonAsync<ServiceResponse<List<TicketDTO>>>($"{BaseUrl}/tickets?isCompleted={isCompletedTickets}");
 
                 return tickets ?? new();
             }
             catch (Exception ex)
             {
-                _snackbar.Add(ex.Message, Severity.Error);
-
                 return new();
             }
         }
 
-        public async Task CreateNewTicketAsync(TicketDTO ticket)
+        public async Task<ServiceResponse<bool>> CreateNewTicketAsync(TicketDTO ticket)
         {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/tickets/create", ticket);
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets", ticket);
 
-            if (response.IsSuccessStatusCode)
-                _snackbar.Add("Hiba sikeresen létrehozva!", Severity.Success);
-            else
-                _snackbar.Add("Hiba történt a hiba létrehozásakor.", Severity.Error);
-        }
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
-        public async Task<bool> UpdateTicket(TicketDTO ticket)
-        {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/tickets/update", ticket);
-
-            bool result = false;
-
-            if (response.IsSuccessStatusCode)
+            return result ?? new ServiceResponse<bool>
             {
-                result = await response.Content.ReadFromJsonAsync<bool>();
-            }
-
-            if (result)
-                _snackbar.Add("Hiba sikeresen törölve!", Severity.Success);
-            else
-                _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
-
-            return result;
+                IsSuccess = false,
+                Message = "A szerver válasza érvénytelen."
+            };
         }
 
-        public async Task<bool> DeleteTicket(int ticketId)
+        public async Task<ServiceResponse<bool>> UpdateTicket(TicketDTO ticket)
         {
-            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/delete", ticketId);
+            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/tickets/{ticket.Id}", ticket);
 
-            bool result = false;
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
-            if (response.IsSuccessStatusCode)
+            return result ?? new ServiceResponse<bool>
             {
-                result = await response.Content.ReadFromJsonAsync<bool>();
-            }
-
-            if (result)
-                _snackbar.Add("Hiba sikeresen törölve!", Severity.Success);
-            else
-                _snackbar.Add("Hiba történt a hiba törlésekor.", Severity.Error);
-
-            return result;
+                IsSuccess = false,
+                Message = "A szerver válasza érvénytelen."
+            };
         }
 
-        public async Task<bool> RateTicket(TicketDTO ticket)
+        public async Task<ServiceResponse<bool>> DeleteTicket(int ticketId)
+        {
+            var response = await _httpClient.DeleteAsync($"{BaseUrl}/tickets/{ticketId}");
+
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+
+            return result ?? new ServiceResponse<bool>
+            {
+                IsSuccess = false,
+                Message = "A szerver válasza érvénytelen."
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> RateTicket(TicketDTO ticket)
         {
             var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/{ticket.Id}/feedback", ticket);
 
-            bool result = false;
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
-            if (response.IsSuccessStatusCode)
+            if (result == null)
             {
-                result = await response.Content.ReadFromJsonAsync<bool>();
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "A szerver válasza érvénytelen."
+                };
             }
 
             return result;

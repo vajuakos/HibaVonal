@@ -16,7 +16,7 @@ namespace HibaVonal.Shared.DTO
 
         public int? Rating { get; set; }
 
-        public string RatingComment { get; set; }
+        public string FeedbackComment { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

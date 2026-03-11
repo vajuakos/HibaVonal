@@ -4,14 +4,14 @@ namespace HibaVonal.Client.Services.MaintenanceService
 {
     public interface IMaintenanceService
     {
-        Task<List<TicketDTO>> GetTicketsAsync(bool isCompletedTickets);
+        Task<ServiceResponse<List<TicketDTO>>> GetTicketsAsync(bool isCompletedTickets);
 
-        Task CreateNewTicketAsync(TicketDTO ticket);
+        Task<ServiceResponse<bool>> CreateNewTicketAsync(TicketDTO ticket);
 
-        Task<bool> UpdateTicket(TicketDTO ticket);
+        Task<ServiceResponse<bool>> UpdateTicket(TicketDTO ticket);
 
-        Task<bool> DeleteTicket(int ticketId);
+        Task<ServiceResponse<bool>> DeleteTicket(int ticketId);
 
-        Task<bool> RateTicket(TicketDTO ticket);
+        Task<ServiceResponse<bool>> RateTicket(TicketDTO ticket);
     }
 }
