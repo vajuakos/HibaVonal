@@ -61,14 +61,16 @@ builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
 
 var app = builder.Build();
 
+// Seed database with initial dummy data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
     var context = services.GetRequiredService<DataContext>();
 
-    await SeedData.SeedUsers(userManager);
+    await SeedData.SeedUsers(userManager, roleManager);
 }
 
 // Configure the HTTP request pipeline.
