@@ -16,7 +16,7 @@ namespace HibaVonal.API.Services.MaintenanceService
             _context = context;
         }
 
-        public async Task<List<TicketDTO>> GetTickets(int currentUserId, bool isCompleted)
+        public async Task<ServiceResponse<List<TicketDTO>>> GetTickets(int currentUserId, bool isCompleted)
         {
             var query = _context.MaintenanceTickets
                 .AsNoTracking()
@@ -27,7 +27,7 @@ namespace HibaVonal.API.Services.MaintenanceService
             else
                 query = query.Where(t => t.Status != TicketStatus.Resolved);
 
-            return await query
+            var tickets = await query
                 .Select(t => new TicketDTO
                 {
                     Id = t.Id,
@@ -42,74 +42,83 @@ namespace HibaVonal.API.Services.MaintenanceService
                         .Select(f => (int?)f.Rating)
                         .FirstOrDefault(),
 
-                    RatingComment = _context.Feedbacks
+                    FeedbackComment = _context.Feedbacks
                         .Where(f => f.TicketId == t.Id)
                         .Select(f => f.FeedbackComment)
                         .FirstOrDefault()
                 })
                 .ToListAsync();
+
+            return new ServiceResponse<List<TicketDTO>>
+            {
+                Data = tickets,
+                IsSuccess = true
+            };
         }
 
-        public async Task AddTicket(TicketDTO ticketDto, int currentUserId)
+        public async Task<ServiceResponse<bool>> AddTicket(TicketDTO ticketDto, int currentUserId)
         {
             var ticket = ticketDto.ToEntity(currentUserId);
 
+            if (ticket == null) return new ServiceResponse<bool> { IsSuccess = false, Message = "Sikertelen rögzítés!" };
+
             _context.MaintenanceTickets.Add(ticket);
 
-            await _context.SaveChangesAsync();
+            var count = await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool> { IsSuccess = count > 0, Message = "Sikeres rögzítés!" };
         }
 
-        public async Task<bool> UpdateTicket(TicketDTO ticketDto, int currentUserId)
+        public async Task<ServiceResponse<bool>> UpdateTicket(int ticketId, TicketDTO ticketDto, int currentUserId)
         {
             var existingTicket = await _context.MaintenanceTickets
-                .FirstOrDefaultAsync(t => t.Id == ticketDto.Id);
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
 
-            if (existingTicket == null) return false;
+            if (existingTicket == null) return new ServiceResponse<bool> { IsSuccess = false, Message = "Nem található hibajegy!" };
 
-            if (existingTicket.CreatedById != currentUserId) return false;
+            if (existingTicket.CreatedById != currentUserId) return new ServiceResponse<bool> { IsSuccess = false, Message = "Nem jogosult a módosításra!" };
 
             existingTicket.Title = ticketDto.Title;
             existingTicket.Description = ticketDto.Description;
             existingTicket.RoomNumber = ticketDto.RoomNumber;
 
-            await _context.SaveChangesAsync();
+            var count = await _context.SaveChangesAsync();
 
-            return true;
+            return new ServiceResponse<bool> { IsSuccess = count > 0, Message = "Sikeres módosítás!" };
         }
 
-        public async Task<bool> DeleteTicket(int id)
+        public async Task<ServiceResponse<bool>> DeleteTicket(int id, int currentUserId)
         {
             var ticket = await _context.MaintenanceTickets.FindAsync(id);
 
-            if (ticket == null)
-            {
-                return false;
-            }
+            if (ticket == null) return new ServiceResponse<bool> { IsSuccess = false, Message = "Nem található hibajegy!" };
+
+            if (ticket.CreatedById != currentUserId) return new ServiceResponse<bool> { IsSuccess = false, Message = "Nem jogosult a törlésre!" };
 
             _context.MaintenanceTickets.Remove(ticket);
 
             var affectedRows = await _context.SaveChangesAsync();
 
-            return affectedRows > 0;
+            return new ServiceResponse<bool> { IsSuccess = affectedRows > 0, Message = "Sikeres törlés!" };
         }
 
-        public async Task<bool> SubmitFeedback(int ticketId, TicketDTO ticketDto, int currentUserId)
+        public async Task<ServiceResponse<bool>> SubmitFeedback(int ticketId, TicketDTO ticketDto, int currentUserId)
         {
             var ticketExists = await _context.MaintenanceTickets
                 .AnyAsync(t => t.Id == ticketId && t.CreatedById == currentUserId);
 
-            if (!ticketExists) return false;
+            if (!ticketExists) return new ServiceResponse<bool> { IsSuccess = false, Message = "Nem található a hibajegy!" };
 
             var alreadyRated = await _context.Feedbacks
                 .AnyAsync(f => f.TicketId == ticketId);
 
-            if (alreadyRated) return false;
+            if (alreadyRated) return new ServiceResponse<bool> { IsSuccess = false, Message = "A hibajegy már értékelésre került!" };
 
             var newFeedback = new TicketFeedback
             {
                 TicketId = ticketId,
                 Rating = ticketDto.Rating ?? 0,
-                FeedbackComment = ticketDto.RatingComment,
+                FeedbackComment = ticketDto.FeedbackComment,
                 CreatedAt = DateTime.Now,
                 FeedbackerId = currentUserId
             };
@@ -118,7 +127,7 @@ namespace HibaVonal.API.Services.MaintenanceService
 
             var count = await _context.SaveChangesAsync();
 
-            return count > 0;
+            return new ServiceResponse<bool> { IsSuccess = count > 0, Message = "Sikeres rögzítés!" };
         }
     }
 }
