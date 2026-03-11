@@ -1,43 +1,83 @@
 ﻿@page "/maintenance/add-ticket"
 
-<MudContainer MaxWidth="MaxWidth.Medium">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
 
-    <MudPaper Elevation="3">
+    <MudPaper Elevation="4" Class="pa-8 rounded-xl">
 
         <MudForm @ref="_addForm">
-            <MudStack Class="ma-4">
 
-                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                    <div style="border-bottom: 2px black solid;">
-                        <MudText Typo="Typo.h6">Hibabejelentés</MudText>
-                    </div>
-                    <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" />
-                </MudStack>
+            <div class="d-flex align-center mb-8">
+                <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Class="mr-4" Style="width: 56px; height: 56px;">
+                    <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" Size="Size.Large" />
+                </MudAvatar>
+                <div>
+                    <MudText Typo="Typo.h5" Class="font-weight-bold">Új hibabejelentés</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">Kérjük, add meg a hiba részleteit a gyors javítás érdekében.</MudText>
+                </div>
+            </div>
 
-                <MudGrid>
-                    <MudItem xs="12" md="10">
-                        <MudTextField @bind-Value="ticket.Title" Label="Címke" Variant="Variant.Outlined" FullWidth="true" />
-                    </MudItem>
-                    <MudItem xs="12" md="2">
-                        <MudNumericField @bind-Value="ticket.RoomNumber" Label="Szobaszám" Variant="Variant.Outlined" FullWidth="true" />
-                    </MudItem>
-                </MudGrid>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="9">
+                    <MudTextField @bind-Value="ticket.Title"
+                                  Label="Hiba megnevezése"
+                                  Placeholder="pl. Kiégett a villanykörte, Nem folyik a melegvíz..."
+                                  Required="true"
+                                  RequiredError="Kérlek, adj meg egy rövid címet!"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Title"
+                                  FullWidth="true" />
+                </MudItem>
 
-                <MudTextField T="string"
-                    Label="Leírás"
-                    Variant="Variant.Outlined"
-                    Lines="8"
-                    @bind-Value="ticket.Description" />
+                <MudItem xs="12" md="3">
+                    <MudNumericField @bind-Value="ticket.RoomNumber"
+                                     Label="Szoba"
+                                     Required="true"
+                                     RequiredError="Kötelező!"
+                                     Variant="Variant.Outlined"
+                                     Min="1"
+                                     Max="999"
+                                     HideSpinButtons="false"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.MeetingRoom"
+                                     FullWidth="true" />
+                </MudItem>
 
-                <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Save"
-                               OnClick="HandleSubmit">
-                        Mentés
-                    </MudButton>
-                </MudStack>
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  @bind-Value="ticket.Description"
+                                  Label="Részletes leírás"
+                                  Placeholder="Írd le pontosan, hol található a hiba és mi a jelenség..."
+                                  Required="true"
+                                  RequiredError="A leírás megadása kötelező!"
+                                  Variant="Variant.Outlined"
+                                  Lines="6"
+                                  Counter="1000"
+                                  MaxLength="1000"
+                                  Immediate="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Description" />
+                </MudItem>
+            </MudGrid>
 
+            <MudDivider Class="my-6" />
+
+            <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="3">
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Default"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           OnClick="@(() => NavigationManager.NavigateTo("/maintenance/tickets"))"
+                           Class="px-6">
+                    Mégse
+                </MudButton>
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Send"
+                           OnClick="HandleSubmit"
+                           Class="px-10 rounded-pill">
+                    Hibajegy beküldése
+                </MudButton>
             </MudStack>
 
         </MudForm>
@@ -46,8 +86,9 @@
 </MudContainer>
 
 @code {
-    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
     [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+    [Inject] ISnackbar Snackbar { get; set; } = default!;
 
     MudForm _addForm;
     TicketDTO ticket = new();
@@ -58,7 +99,9 @@
 
         if (_addForm.IsValid)
         {
-            await MaintenanceService.CreateNewTicketAsync(ticket);
+            var result = await MaintenanceService.CreateNewTicketAsync(ticket);
+            Snackbar.Add(result.Message, result.IsSuccess ? Severity.Success : Severity.Error);
+
             NavigationManager.NavigateTo("/maintenance/tickets");
         }
     }
