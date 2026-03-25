@@ -435,3 +435,6 @@ FodyWeavers.xsd
 # User settings
 *.user
 *.suo
+
+# Local-only startup files
+/Start.bat
