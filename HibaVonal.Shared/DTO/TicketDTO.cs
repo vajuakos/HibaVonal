@@ -19,5 +19,11 @@ namespace HibaVonal.Shared.DTO
         public string FeedbackComment { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public int? AssignedToId { get; set; }
+
+        public string? AssignedToEmail { get; set; }
+
+        public string? CreatedByEmail { get; set; }
     }
 }
