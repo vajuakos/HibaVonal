@@ -1,0 +1,46 @@
+﻿@using System.Linq
+@page "/admin/users"
+@using HibaVonal.Shared.DTO
+@inject HttpClient Http
+
+<MudText Typo="Typo.h4" Class="mb-4">Felhasználók kezelése</MudText>
+@if (users == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+}else if (!Users.Any())
+{
+    <MudAlert Severity="Severity.Info">Nincsenek regisztrált felhasználók.</MudAlert>
+
+}
+else
+{
+    <MudTable Items="@users" Hover="true" Striped="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>Azonosító</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Szerepkör</MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLable="Azonosító">@context.FullName</MudTd>
+            <MudTd DataLable="Email">@context.Email</MudTd>
+            <MudTd DataLable="Szerepkör">@context.Role</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+@code {
+    private List<UserDTO>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await Http.GetFromJsonAsync<List<UserDTO>>("api/auth/users");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Hiba: " + ex.Message);
+            users = new List<UserDTO>();
+        }
+    }
+}
