@@ -3,6 +3,7 @@ using HibaVonal.Client;
 using HibaVonal.Client.Handlers;
 using HibaVonal.Client.Services.AuthService;
 using HibaVonal.Client.Services.MaintenanceService;
+using HibaVonal.Client.Services.ManagerService;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -34,6 +35,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 // Custom services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
 
 // Configure MudBlazor Snackbar settings
 builder.Services.AddMudServices(config =>

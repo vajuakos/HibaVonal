@@ -4,7 +4,7 @@
 @using HibaVonal.Shared.DTO
 @using HibaVonal.Shared.Enum
 @using Microsoft.AspNetCore.Components.Forms
-@inject HibaVonal.Client.Services.MaintenanceService.IMaintenanceService MaintenanceService
+@inject HibaVonal.Client.Services.ManagerService.IManagerService ManagerService
 
 <h3>Karbantartási vezető - Ticketek</h3>
 
@@ -72,13 +72,13 @@ else
 
     private async Task LoadTickets()
     {
-        var result = await MaintenanceService.GetManagerTicketsAsync(false);
+        var result = await ManagerService.GetTicketsAsync(false);
         _tickets = result.Data ?? new List<TicketDTO>();
     }
 
     private async Task SaveStatus(TicketDTO ticket)
     {
-        var result = await MaintenanceService.UpdateTicketStatusForManagerAsync(ticket.Id, ticket.Status);
+        var result = await ManagerService.UpdateTicketStatusAsync(ticket.Id, ticket.Status);
 
         _message = result.Message;
 
