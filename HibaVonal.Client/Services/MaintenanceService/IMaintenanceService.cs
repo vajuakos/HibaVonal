@@ -1,4 +1,5 @@
 ﻿using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.Enum;
 
 namespace HibaVonal.Client.Services.MaintenanceService
 {
@@ -13,5 +14,9 @@ namespace HibaVonal.Client.Services.MaintenanceService
         Task<ServiceResponse<bool>> DeleteTicket(int ticketId);
 
         Task<ServiceResponse<bool>> RateTicket(TicketDTO ticket);
+
+        Task<ServiceResponse<List<TicketDTO>>> GetManagerTicketsAsync(bool isCompletedTickets);
+
+        Task<ServiceResponse<bool>> UpdateTicketStatusForManagerAsync(int ticketId, TicketStatus status);
     }
 }

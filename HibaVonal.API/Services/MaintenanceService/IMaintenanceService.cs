@@ -1,4 +1,5 @@
 ﻿using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.Enum;
 
 namespace HibaVonal.API.Services.MaintenanceService
 {
@@ -14,5 +15,8 @@ namespace HibaVonal.API.Services.MaintenanceService
 
         public Task<ServiceResponse<bool>> SubmitFeedback(int ticketId, TicketDTO ticketDto, int currentUserId);
 
+        public Task<ServiceResponse<List<TicketDTO>>> GetAllTicketsForManagerAsync(bool isCompletedTickets);
+
+        public Task<ServiceResponse<bool>> UpdateTicketStatusForManagerAsync(int ticketId, TicketStatus status);
     }
 }
