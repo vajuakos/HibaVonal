@@ -1,4 +1,4 @@
-﻿using HibaVonal.API.Services.ManagerService;
+﻿using HibaVonal.API.Services.ManagementService;
 using HibaVonal.Shared.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,26 +8,26 @@ namespace HibaVonal.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "MaintenanceManager,Admin,DEV")]
-    public class ManagerController : ApiControllerBase
+    public class ManagementController : ApiControllerBase
     {
-        private readonly IManagerService _managerService;
+        private readonly IManagementService _managementService;
 
-        public ManagerController(IManagerService managerService)
+        public ManagementController(IManagementService managementService)
         {
-            _managerService = managerService;
+            _managementService = managementService;
         }
 
         [HttpGet("tickets")]
         public async Task<ActionResult<ServiceResponse<List<TicketDTO>>>> GetAllTickets([FromQuery] bool isCompleted = false)
         {
-            var result = await _managerService.GetAllTicketsAsync(isCompleted);
+            var result = await _managementService.GetAllTicketsAsync(isCompleted);
             return Ok(result);
         }
 
         [HttpPut("tickets/{ticketId}/status")]
         public async Task<ActionResult<ServiceResponse<bool>>> UpdateTicketStatus(int ticketId, [FromBody] TicketDTO ticket)
         {
-            var result = await _managerService.UpdateTicketStatusAsync(ticketId, ticket.Status);
+            var result = await _managementService.UpdateTicketStatusAsync(ticketId, ticket.Status);
             return Ok(result);
         }
     }

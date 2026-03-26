@@ -3,13 +3,13 @@ using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
 
-namespace HibaVonal.API.Services.ManagerService
+namespace HibaVonal.API.Services.ManagementService
 {
-    public class ManagerService : IManagerService
+    public class ManagementService : IManagementService
     {
         private readonly DataContext _context;
 
-        public ManagerService(DataContext context)
+        public ManagementService(DataContext context)
         {
             _context = context;
         }

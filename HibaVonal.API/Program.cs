@@ -2,7 +2,7 @@ using HibaVonal.API.Data;
 using HibaVonal.API.Models;
 using HibaVonal.API.Services.AuthService;
 using HibaVonal.API.Services.MaintenanceService;
-using HibaVonal.API.Services.ManagerService;
+using HibaVonal.API.Services.ManagementService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +59,7 @@ builder.Services.AddIdentityCore<AppUser>(options => {
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
-builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IManagementService, ManagementService>();
 
 var app = builder.Build();
 
