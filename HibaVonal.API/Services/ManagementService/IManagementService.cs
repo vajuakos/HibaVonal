@@ -1,9 +1,9 @@
 ﻿using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.Enum;
 
-namespace HibaVonal.API.Services.ManagerService
+namespace HibaVonal.API.Services.ManagementService
 {
-    public interface IManagerService
+    public interface IManagementService
     {
         Task<ServiceResponse<List<TicketDTO>>> GetAllTicketsAsync(bool isCompletedTickets);
 

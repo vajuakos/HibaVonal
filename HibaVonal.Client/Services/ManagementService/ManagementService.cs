@@ -2,15 +2,15 @@
 using HibaVonal.Shared.Enum;
 using System.Net.Http.Json;
 
-namespace HibaVonal.Client.Services.ManagerService
+namespace HibaVonal.Client.Services.ManagementService
 {
-    public class ManagerService : IManagerService
+    public class ManagementService : IManagementService
     {
-        private const string BaseUrl = "api/manager";
+        private const string BaseUrl = "api/management";
 
         private readonly HttpClient _httpClient;
 
-        public ManagerService(HttpClient httpClient)
+        public ManagementService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

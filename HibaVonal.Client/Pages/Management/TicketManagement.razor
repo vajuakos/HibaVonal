@@ -1,10 +1,5 @@
-@page "/manager/tickets"
+@page "/management/tickets"
 @attribute [Authorize(Roles = "MaintenanceManager,Admin,DEV")]
-
-@using HibaVonal.Shared.DTO
-@using HibaVonal.Shared.Enum
-@using Microsoft.AspNetCore.Components.Forms
-@inject HibaVonal.Client.Services.ManagerService.IManagerService ManagerService
 
 <h3>Karbantartási vezető - Ticketek</h3>
 
@@ -62,6 +57,8 @@ else
 }
 
 @code {
+    [Inject] IManagementService ManagerService { get; set; }
+
     private List<TicketDTO>? _tickets;
     private string? _message;
 
