@@ -1,4 +1,5 @@
-﻿<MudAppBar Elevation="1" Fixed="true" Color="Color.Primary">
+﻿@using System.Security.Claims
+<MudAppBar Elevation="1" Fixed="true" Color="Color.Primary">
     <div @onclick="NavigateToHome" class="d-flex align-items-center">
         <MudImage Src="img/logo.png" Alt="HibaVonal Logo" Width="40" Class="mr-3" />
         <MudText Typo="Typo.h5" Class="mr-8">HibaVonal</MudText>
@@ -8,6 +9,7 @@
         <Authorized>
             <MudButton href="maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
             <MudButton href="/maintenance" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
+            <MudButton href="/management/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartások</MudButton>
             <MudButton href="/users" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Felhasználók</MudButton>
            
         </Authorized>
@@ -20,7 +22,7 @@
             <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
                 <ActivatorContent>
                     <MudChip T="string" Icon="@Icons.Material.Filled.Person" Color="Color.Secondary" Class="px-4">
-                        Felhasználó
+                        @(context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "")
                     </MudChip>
                 </ActivatorContent>
                 <ChildContent>

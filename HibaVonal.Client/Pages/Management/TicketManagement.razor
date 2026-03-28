@@ -1,0 +1,87 @@
+@page "/management/tickets"
+@attribute [Authorize(Roles = "MaintenanceManager,Admin,DEV")]
+
+<h3>Karbantartási vezető - Ticketek</h3>
+
+@if (!string.IsNullOrWhiteSpace(_message))
+{
+    <p>@_message</p>
+}
+
+@if (_tickets == null)
+{
+    <p>Töltés...</p>
+}
+else if (!_tickets.Any())
+{
+    <p>Nincs megjeleníthető ticket.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cím</th>
+                <th>Szoba</th>
+                <th>Állapot</th>
+                <th>Létrehozó</th>
+                <th>Hozzárendelve</th>
+                <th>Művelet</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in _tickets)
+            {
+                <tr>
+                    <td>@ticket.Id</td>
+                    <td>@ticket.Title</td>
+                    <td>@ticket.RoomNumber</td>
+                    <td>
+                        <InputSelect @bind-Value="ticket.Status">
+                            @foreach (var status in Enum.GetValues<TicketStatus>())
+                            {
+                                <option value="@status">@status.ToDisplayString()</option>
+                            }
+                        </InputSelect>
+                    </td>
+                    <td>@ticket.CreatedByEmail</td>
+                    <td>@(ticket.AssignedToEmail ?? "Nincs hozzárendelve")</td>
+                    <td>
+                        <button @onclick="() => SaveStatus(ticket)">Mentés</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Inject] IManagementService ManagerService { get; set; }
+
+    private List<TicketDTO>? _tickets;
+    private string? _message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTickets();
+    }
+
+    private async Task LoadTickets()
+    {
+        var result = await ManagerService.GetTicketsAsync(false);
+        _tickets = result.Data ?? new List<TicketDTO>();
+    }
+
+    private async Task SaveStatus(TicketDTO ticket)
+    {
+        var result = await ManagerService.UpdateTicketStatusAsync(ticket.Id, ticket.Status);
+
+        _message = result.Message;
+
+        if (result.IsSuccess)
+        {
+            await LoadTickets();
+        }
+    }
+}

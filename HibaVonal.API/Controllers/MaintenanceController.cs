@@ -1,7 +1,6 @@
 ﻿using HibaVonal.API.Services.MaintenanceService;
 using HibaVonal.Shared.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HibaVonal.API.Controllers
@@ -18,22 +17,34 @@ namespace HibaVonal.API.Controllers
             _maintenanceService = maintenanceService;
         }
 
-        [HttpGet("tickets/all")]
-        public Task<List<TicketDTO>> GetAllTickets()
+        [HttpGet("tickets")]
+        public Task<ServiceResponse<List<TicketDTO>>> GetTickets([FromQuery] bool isCompleted)
         {
-            return _maintenanceService.GetAllTickets(CurrentUserId);
+            return _maintenanceService.GetTickets(CurrentUserId, isCompleted);
         }
 
-        [HttpPut("tickets/create")]
-        public void CreateTicket(TicketDTO ticket)
+        [HttpPost("tickets")]
+        public async Task<ServiceResponse<bool>> CreateTicket(TicketDTO ticket)
         {
-            _maintenanceService.AddTicket(ticket, CurrentUserId);
+            return await _maintenanceService.AddTicket(ticket, CurrentUserId);
         }
 
-        [HttpPost("tickets/delete")]
-        public async Task<bool> DeleteTicket([FromBody] int ticketId)
+        [HttpPut("tickets/{ticketId}")]
+        public async Task<ServiceResponse<bool>> UpdateTicket(int ticketId, TicketDTO ticket)
         {
-            return await _maintenanceService.DeleteTicket(ticketId);
+            return await _maintenanceService.UpdateTicket(ticketId, ticket, CurrentUserId);
+        }
+
+        [HttpDelete("tickets/{ticketId}")]
+        public async Task<ServiceResponse<bool>> DeleteTicket(int ticketId)
+        {
+            return await _maintenanceService.DeleteTicket(ticketId, CurrentUserId);
+        }
+
+        [HttpPost("tickets/{ticketId}/feedback")]
+        public async Task<ServiceResponse<bool>> SubmitFeedback(int ticketId, TicketDTO ticket)
+        {
+            return await _maintenanceService.SubmitFeedback(ticketId, ticket, CurrentUserId);
         }
     }
 }

@@ -13,34 +13,86 @@
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         border-radius: 10px;
     }
+
+    .blurry {
+        backdrop-filter: blur(10px);
+    }
 </style>
 
-<MudPaper Class="mb-4">
+<MudPaper Elevation="2" Class="pa-4 mb-6 rounded-xl border-solid border-2 mud-border-primary" Style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);">
 
-    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-        <MudText Typo="Typo.h5" Align="Align.Center" Class="ma-4">Kollégiumi hibabejelentő</MudText>
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="4">
 
-        <MudButton Variant="Variant.Outlined"
-            StartIcon="@Icons.Material.Filled.Add"
-            Color="Color.Primary"
-            Class="ma-4"
-            OnClick="HandleCreateTicket">
-            Bejelentés
-        </MudButton>
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+            <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" Class="elevation-2">
+                <MudIcon Icon="@Icons.Material.Filled.Engineering" />
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h5" Class="font-weight-bold" Style="line-height: 1.2;">Hibabejelentő</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary text-uppercase font-weight-bold">Kollégiumi karbantartás</MudText>
+            </div>
+        </MudStack>
+
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4" Wrap="Wrap.Wrap">
+
+            <MudPaper Elevation="0" Class="px-4 py-1 rounded-pill d-flex align-center" Style="background: rgba(var(--mud-palette-primary-rgb), 0.05); border: 1px solid rgba(var(--mud-palette-primary-rgb), 0.1);">
+                <MudSwitch T="bool"
+                           Value="isCompletedTicketsShowing"
+                           ValueChanged="OnSwitchChanged"
+                           ThumbIcon="@(isCompletedTicketsShowing ? Icons.Material.Filled.DoneAll : Icons.Material.Filled.PendingActions)"
+                           Color="@(isCompletedTicketsShowing ? Color.Success : Color.Warning)"
+                           Label="@(isCompletedTicketsShowing ? "Lezárt jegyek" : "Folyamatban")"
+                           Class="ma-0 font-weight-medium" />
+            </MudPaper>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.AddAlert"
+                       OnClick="HandleCreateTicket"
+                       Class="px-6 rounded-pill font-weight-bold">
+                Új bejelentés
+            </MudButton>
+
+        </MudStack>
+
     </MudStack>
-
 </MudPaper>
 
 <MudGrid Justify="Justify.Center">
     @if (tickets.Count == 0)
     {
-        <MudItem md="4">
-            <MudPaper Class="pa-4">
-                <MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
-                    <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error" />
-                    <MudText>Nincs rögzített hibajegy!</MudText>
-                </MudStack>
-            </MudPaper>
+        <MudItem xs="12">
+            <div class="d-flex justify-center align-center w-100" style="min-height: 350px;">
+                <MudPaper Elevation="0"
+                          Class="pa-8 d-flex flex-column align-center justify-center rounded-xl"
+                          Style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-width: 450px; width: 100%;">
+
+                    <MudIcon Icon="@(isCompletedTicketsShowing? Icons.Material.Outlined.CheckCircleOutline : Icons.Material.Outlined.Inbox)"
+                             Style="@($"font-size: 5rem; color: {(isCompletedTicketsShowing ? "rgba(76, 175, 80, 0.8)" : "rgba(255, 255, 255, 0.9)")};")"
+                             Class="mb-4" />
+
+                    <MudText Typo="Typo.h5" Class="text-center mb-2" Style="color: #ffffff; font-weight: 400; letter-spacing: 0.5px;">
+                        @(isCompletedTicketsShowing ? "Nincs lezárt hibajegy" : "Nincsenek folyamatban lévő hibák")
+                    </MudText>
+
+                    <MudText Typo="Typo.body1" Class="text-center mb-6" Style="color: rgba(255, 255, 255, 0.7); font-weight: 300;">
+                        @(isCompletedTicketsShowing
+                                            ? "Jelenleg egyetlen hibajegy sincs lezárva. Az elvégzett munkák itt fognak megjelenni." 
+                                            : "Szuper hír! Jelenleg minden rendben működik, nincsenek megoldásra váró feladatok.")
+                    </MudText>
+
+                    @if (!isCompletedTicketsShowing)
+                    {
+                        <MudButton Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="HandleCreateTicket"
+                                   Class="rounded-pill px-6"
+                                   Style="color: #ffffff; border-color: rgba(255, 255, 255, 0.4); text-transform: none; font-weight: 300;">
+                            Új bejelentés hozzáadása
+                        </MudButton>
+                    }
+                </MudPaper>
+            </div>
         </MudItem>
     }
     else
@@ -48,26 +100,69 @@
         @foreach (var ticket in tickets)
         {
             <MudItem xs="12" sm="6" md="4" lg="3">
-                <MudCard Elevation="3" Class="mt-4" Style="height: 200px; overflow:hidden">
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.subtitle2"
-                                         Color="Color.Primary"
-                                         Style="font-weight: bold">
-                                    #@ticket.Id
-                                </MudText>
+                <MudCard Elevation="4" Class="rounded-lg mud-width-full" Style="transition: transform 0.2s; cursor: pointer;"
+                         onmouseover="this.style.transform='translateY(-4px)'"
+                         onmouseout="this.style.transform='translateY(0)'">
 
-                                <MudText Typo="Typo.subtitle2">@ticket.Title</MudText>
-                            </MudStack>
+                    <MudCardHeader Class="pb-0">
+                        <CardHeaderContent>
+                            <div class="d-flex justify-space-between align-start">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.caption" Color="Color.Primary" Class="fw-bold text-uppercase">
+                                        #@ticket.Id • @ticket.CreatedAt.ToString("yyyy.MM.dd")
+                                    </MudText>
+                                    <MudText Typo="Typo.h6" Class="mud-text-secondary mt-n1" Style="font-weight: 700;">
+                                        @ticket.Title
+                                    </MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small"
+                                         Variant="Variant.Text"
+                                         Color="@ColorHelper.GetStatusColor(ticket.Status)"
+                                         Class="ml-2">
+                                    @TicketStatusExtensions.ToDisplayString(ticket.Status)
+                                </MudChip>
+                            </div>
                         </CardHeaderContent>
                     </MudCardHeader>
-                    <MudCardContent>
-                        <MudText>@ticket.Description</MudText>
+
+                    <MudCardContent Style="height: 100px; overflow-y: auto;">
+                        <MudText Typo="Typo.body2" Color="Color.Default" Class="line-clamp-3">
+                            @ticket.Description
+                        </MudText>
+                        @if (!string.IsNullOrEmpty(ticket.RoomNumber.ToString()))
+                        {
+                            <MudChip T="string" Icon="@Icons.Material.Filled.MeetingRoom" Size="Size.Small" Class="mt-2 px-2">
+                                @ticket.RoomNumber. szoba
+                            </MudChip>
+                        }
                     </MudCardContent>
-                    <MudCardActions>
-                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
-                        <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" OnClick="@(() => DeleteTicket(ticket.Id))" />
+
+                    <MudDivider DividerType="DividerType.Middle" Class="mx-4 my-1" />
+
+                    <MudCardActions Class="d-flex justify-end px-4 pb-3">
+                        @if (ticket.Status == TicketStatus.New)
+                        {
+                            <MudTooltip Text="Szerkesztés">
+                                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Color="Color.Info" Size="Size.Small" OnClick="@(() => UpdateTicket(ticket))" />
+                            </MudTooltip>
+                            <MudTooltip Text="Törlés">
+                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteTicket(ticket.Id))" />
+                            </MudTooltip>
+                        }
+                        else
+                        {
+                            <MudStack Row AlignItems="AlignItems.Center">
+                                
+                                <MudButton StartIcon="@Icons.Material.Filled.Star"
+                                           Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Color="Color.Warning"
+                                           OnClick="@(() => RateTicket(ticket))">
+                                    Értékelés
+                                </MudButton>
+
+                            </MudStack>
+                        }
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -75,15 +170,34 @@
     }
 </MudGrid>
 
-@code {
-    [Inject] IMaintenanceService MaintenanceService { get; set; }
+    @code {
     [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] IMaintenanceService MaintenanceService { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
 
     List<TicketDTO> tickets = new();
+    bool isCompletedTicketsShowing = false;
+
+    private async Task LoadTickets()
+    {
+        var response = await MaintenanceService.GetTicketsAsync(isCompletedTicketsShowing);
+
+        if (response.IsSuccess)
+            tickets = response.Data;
+        else
+            Snackbar.Add(response.Message, Severity.Error);
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        tickets = await MaintenanceService.GetTicketsAsync();
+        await LoadTickets();
+    }
+
+    private async Task OnSwitchChanged(bool newValue)
+    {
+        isCompletedTicketsShowing = newValue;
+        await LoadTickets();
     }
 
     private void HandleCreateTicket()
@@ -91,18 +205,88 @@
         NavigationManager.NavigateTo("/maintenance/add-ticket");
     }
 
-    private async Task DeleteTicket(int tickedId)
+    private async Task UpdateTicket(TicketDTO ticketDTO)
     {
-        var isDeleted = await MaintenanceService.DeleteTicket(tickedId);
-
-        if (isDeleted)
+        var options = new DialogOptions
         {
-            var ticketToRemove = tickets.FirstOrDefault(t => t.Id == tickedId);
-            if (ticketToRemove != null)
+            BackgroundClass = "blurry",
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            NoHeader = true
+        };
+
+        var parameters = new DialogParameters<EditTicketDialog> { { x => x.Ticket, ticketDTO } };
+
+        var dialog = await DialogService.ShowAsync<EditTicketDialog>("Hibajegy szerkesztés", parameters, options);
+        
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled && result.Data is TicketDTO updatedTicket)
+        {
+            var response = await MaintenanceService.UpdateTicket(updatedTicket);
+
+            if (response.IsSuccess)
             {
-                tickets.Remove(ticketToRemove);
-                StateHasChanged();
+                Snackbar.Add(response.Message, Severity.Success);
+
+                var index = tickets.FindIndex(t => t.Id == updatedTicket.Id);
+                if (index != -1)
+                {
+                    tickets[index] = updatedTicket;
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                Snackbar.Add(response.Message, Severity.Error);
             }
         }
+    }
+
+    private async Task DeleteTicket(int ticketId)
+    {
+        bool? confirmed = await DialogService.ShowMessageBox(
+            "Törlés megerősítése",
+            "Biztosan véglegesen törölni szeretnéd ezt a hibajegyet?",
+            yesText: "Törlés",
+            cancelText: "Mégse");
+
+        if (confirmed == true)
+        {
+            var response = await MaintenanceService.DeleteTicket(ticketId);
+
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.Message, Severity.Success);
+
+                var ticketToRemove = tickets.FirstOrDefault(t => t.Id == ticketId);
+                if (ticketToRemove != null)
+                {
+                    tickets.Remove(ticketToRemove);
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                Snackbar.Add(response.Message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task RateTicket(TicketDTO ticketDTO)
+    {
+        var options = new DialogOptions
+        {
+            BackgroundClass = "blurry",
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            NoHeader = true
+        };
+
+        var parameters = new DialogParameters<RateTicketDialog> { { x => x.Ticket, ticketDTO } };
+
+        await DialogService.ShowAsync<RateTicketDialog>("Értékelés", parameters, options);
     }
 }

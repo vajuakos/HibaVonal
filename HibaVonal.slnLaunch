@@ -4,11 +4,13 @@
     "Projects": [
       {
         "Path": "HibaVonal.API\\HibaVonal.API.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "HibaVonal.Client\\HibaVonal.Client.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       }
     ]
   }

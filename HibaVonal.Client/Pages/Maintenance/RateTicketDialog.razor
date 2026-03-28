@@ -1,0 +1,111 @@
+﻿<div class="pa-4">
+    <MudForm @ref="_rateMudForm">
+
+        <div class="d-flex flex-column align-center mb-6">
+            <MudIcon Icon="@(isAlreadyRated? Icons.Material.Filled.Verified : Icons.Material.Filled.RateReview)"
+                     Color="@(isAlreadyRated ? Color.Success : Color.Primary)"
+                     Size="Size.Large"
+                     Class="mb-2" />
+
+            <MudText Typo="Typo.h6" Class="mud-text-secondary font-weight-bold">
+                @(isAlreadyRated ? "Visszajelzés leadva" : "Milyen volt a javítás?")
+            </MudText>
+        </div>
+
+        <MudPaper Elevation="0" Class="pa-4 mb-6 rounded-lg d-flex flex-column align-center" Style="background: rgba(0,0,0,0.03);">
+            <MudRating @bind-SelectedValue="RatingValue"
+                       ReadOnly="isAlreadyRated"
+                       MaxValue="5"
+                       Size="Size.Large"
+                       FullIcon="@Icons.Material.Filled.Star"
+                       EmptyIcon="@Icons.Material.Outlined.StarBorder"
+                       Color="Color.Warning" />
+
+            <MudText Typo="Typo.caption" Class="mt-2 mud-text-secondary">
+                @(isAlreadyRated ? "Köszönjük a pontozást!" : "Kattints a csillagokra az értékeléshez")
+            </MudText>
+        </MudPaper>
+
+        <MudTextField T="string"
+                      Label="Megjegyzés a javítással kapcsolatban"
+                      Placeholder="Írd le röviden a véleményed..."
+                      Variant="Variant.Outlined"
+                      Lines="5"
+                      ReadOnly="isAlreadyRated"
+                      Counter="500"
+                      MaxLength="500"
+                      Immediate="true"
+                      @bind-Value="Ticket.FeedbackComment"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.ChatBubbleOutline"
+                      Class="mb-4" />
+
+        <MudDivider Class="my-4" />
+
+        <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="3">
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Default"
+                       OnClick="Cancel">
+                @(isAlreadyRated ? "Bezárás" : "Mégse")
+            </MudButton>
+
+            @if (!isAlreadyRated)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Send"
+                           DisableElevation="true"
+                           OnClick="HandleSubmit"
+                           Class="px-8 rounded-pill">
+                    Értékelés beküldése
+                </MudButton>
+            }
+        </MudStack>
+
+    </MudForm>
+</div>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+
+    [Inject] ISnackbar Snackbar { get; set; } = default!;
+
+    [Parameter] public TicketDTO Ticket { get; set; } = new();
+
+    private bool isAlreadyRated;
+
+    // Helper property to bind the nullable Rating value
+    private int RatingValue
+    {
+        get => Ticket.Rating ?? 0;
+        set => Ticket.Rating = value;
+    }
+
+    MudForm _rateMudForm;
+
+    protected override void OnInitialized()
+    {
+        isAlreadyRated = Ticket.Rating.HasValue && Ticket.Rating.Value > 0;
+    }
+
+    async Task HandleSubmit()
+    {
+        await _rateMudForm.Validate();
+
+        if (_rateMudForm.IsValid)
+        {
+            var dialogResult = await MaintenanceService.RateTicket(Ticket);
+
+            Snackbar.Add(dialogResult.Message, dialogResult.IsSuccess ? Severity.Success : Severity.Error);
+
+            if (dialogResult.IsSuccess)
+            {
+                MudDialog.Close(DialogResult.Ok(Ticket));
+            }
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

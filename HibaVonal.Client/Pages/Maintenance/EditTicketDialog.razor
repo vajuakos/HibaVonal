@@ -1,0 +1,95 @@
+﻿<div class="pa-4">
+    <MudForm @ref="_editMudForm">
+
+        <div class="d-flex align-center mb-6">
+            <MudIcon Icon="@Icons.Material.Filled.EditNote" Color="Color.Info" Size="Size.Large" Class="mr-3" />
+            <div>
+                <MudText Typo="Typo.h6" Class="font-weight-bold">Hibajegy szerkesztése</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Módosítsd a bejelentés részleteit</MudText>
+            </div>
+        </div>
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="9">
+                <MudTextField T="string"
+                              Label="Hiba megnevezése"
+                              Placeholder="pl. Csöpög a csap, Nem ég a lámpa..."
+                              Required="true"
+                              RequiredError="A megnevezés kötelező!"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Title"
+                              @bind-Value="Ticket.Title" />
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudNumericField Label="Szoba"
+                                 HideSpinButtons="false"
+                                 Required="true"
+                                 RequiredError="Kötelező!"
+                                 Variant="Variant.Outlined"
+                                 Min="1"
+                                 Max="999"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Filled.MeetingRoom"
+                                 @bind-Value="Ticket.RoomNumber" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Részletes leírás"
+                              Placeholder="Kérjük, írd le pontosan a hibát és a helyszínt..."
+                              Required="true"
+                              RequiredError="A leírás nem maradhat üresen!"
+                              Variant="Variant.Outlined"
+                              Lines="6"
+                              Counter="1000"
+                              MaxLength="1000"
+                              Immediate="true"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Description"
+                              @bind-Value="Ticket.Description" />
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-6" />
+
+        <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="3">
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Default"
+                       OnClick="Cancel"
+                       Class="px-6">
+                Mégse
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Info"
+                       StartIcon="@Icons.Material.Filled.SaveAs"
+                       OnClick="HandleSubmit"
+                       Class="px-10 rounded-pill">
+                Módosítások mentése
+            </MudButton>
+        </MudStack>
+
+    </MudForm>
+</div>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+
+    [Parameter] public TicketDTO Ticket { get; set; } = new();
+
+    MudForm _editMudForm;
+
+    async Task HandleSubmit()
+    {
+        await _editMudForm.Validate();
+
+        if (_editMudForm.IsValid)
+            MudDialog.Close(DialogResult.Ok(Ticket));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
