@@ -1,5 +1,5 @@
-﻿@using System.Linq
-@page "/admin/users"
+﻿@page "/users"
+@using System.Linq
 @using HibaVonal.Shared.DTO
 @inject HttpClient Http
 
@@ -7,29 +7,42 @@
 @if (users == null)
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
-}else if (!Users.Any())
+}else if (!users.Any())
 {
     <MudAlert Severity="Severity.Info">Nincsenek regisztrált felhasználók.</MudAlert>
 
 }
-else
-{
-    <MudTable Items="@users" Hover="true" Striped="true" Bordered="true">
-        <HeaderContent>
-            <MudTh>Azonosító</MudTh>
-            <MudTh>Email</MudTh>
-            <MudTh>Szerepkör</MudTh>
-
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLable="Azonosító">@context.FullName</MudTd>
-            <MudTd DataLable="Email">@context.Email</MudTd>
-            <MudTd DataLable="Szerepkör">@context.Role</MudTd>
-        </RowTemplate>
-    </MudTable>
+else{
+<MudTable Items="@users" Hover="true" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="ItemHasBeenCommitted" ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End" EditTrigger="TableEditTrigger.RowClick">
+    <HeaderContent>
+        <MudTh>Név (Azonosító)</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Szerepkör</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Név">@context.FullName</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Szerepkör">@context.Role</MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Név">
+            <MudTextField @bind-Value="@context.FullName" Required />
+        </MudTd>
+        <MudTd DataLabel="Email">
+            <MudTextField @bind-Value="@context.Email" Required />
+        </MudTd>
+        <MudTd DataLabel="Szerepkör">
+            <MudSelect @bind-Value="@context.Role" T="string" Label="Szerepkör" Variant="Variant.Outlined">
+                <MudSelectItem Value="@("Admin")" />
+                <MudSelectItem Value="@("User")" />
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+</MudTable>
 }
 @code {
     private List<UserDTO>? users;
+    private UserDTO elementBeforeEdit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,4 +56,33 @@ else
             users = new List<UserDTO>();
         }
     }
+    // 1. Mentés előtt elmentjük az eredeti állapotot
+    private void BackupItem(object element)
+    {
+        var user = (UserDTO)element;
+        elementBeforeEdit = new UserDTO
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Role = user.Role
+        };
+    }
+
+    // 2. Ha a Mégse (X) gombra kattintasz
+    private void ResetItemToOriginalValues(object element)
+    {
+        var user = (UserDTO)element;
+        user.FullName = elementBeforeEdit.FullName;
+        user.Email = elementBeforeEdit.Email;
+        user.Role = elementBeforeEdit.Role;
+    }
+
+    // 3. Amikor a Pipára kattintasz
+    private void ItemHasBeenCommitted(object element)
+    {
+        var editedUser = (UserDTO)element;
+        _ = Http.PutAsJsonAsync($"api/auth/users/{editedUser.Id}", editedUser);
+    }
 }
+
