@@ -56,7 +56,7 @@ else{
             users = new List<UserDTO>();
         }
     }
-    // 1. Mentés előtt elmentjük az eredeti állapotot
+  
     private void BackupItem(object element)
     {
         var user = (UserDTO)element;
@@ -69,7 +69,7 @@ else{
         };
     }
 
-    // 2. Ha a Mégse (X) gombra kattintasz
+   
     private void ResetItemToOriginalValues(object element)
     {
         var user = (UserDTO)element;
@@ -78,7 +78,6 @@ else{
         user.Role = elementBeforeEdit.Role;
     }
 
-    // 3. Amikor a Pipára kattintasz
     private void ItemHasBeenCommitted(object element)
     {
         var editedUser = (UserDTO)element;
