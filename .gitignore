@@ -438,3 +438,5 @@ FodyWeavers.xsd
 
 # Local-only startup files
 /Start.bat
+/HibaVonal.Client/Pages/Admin/Users.razor
+/HibaVonal.Client/Pages/Admin/Users.razor
