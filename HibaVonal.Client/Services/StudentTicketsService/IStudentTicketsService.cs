@@ -1,8 +1,8 @@
 ﻿using HibaVonal.Shared.DTO;
 
-namespace HibaVonal.Client.Services.MaintenanceService
+namespace HibaVonal.Client.Services.StudentTicketsService
 {
-    public interface IMaintenanceService
+    public interface IStudentTicketsService
     {
         Task<ServiceResponse<List<TicketDTO>>> GetTicketsAsync(bool isCompletedTickets);
 
@@ -12,6 +12,6 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         Task<ServiceResponse<bool>> DeleteTicket(int ticketId);
 
-        Task<ServiceResponse<bool>> RateTicket(TicketDTO ticket);
+        Task<ServiceResponse<bool>> SubmitFeedback(TicketDTO ticket);
     }
 }

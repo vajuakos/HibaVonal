@@ -1,15 +1,15 @@
 ﻿using HibaVonal.Shared.DTO;
 using System.Net.Http.Json;
 
-namespace HibaVonal.Client.Services.MaintenanceService
+namespace HibaVonal.Client.Services.StudentTicketsService
 {
-    public class MaintenanceService : IMaintenanceService
+    public class StudentTicketsService : IStudentTicketsService
     {
-        private const string BaseUrl = "api/maintenance";
+        private const string BaseUrl = "api/student/tickets";
 
         private readonly HttpClient _httpClient;
 
-        public MaintenanceService(HttpClient httpClient)
+        public StudentTicketsService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -19,7 +19,7 @@ namespace HibaVonal.Client.Services.MaintenanceService
             try
             {
                 var tickets = await _httpClient.GetFromJsonAsync<ServiceResponse<List<TicketDTO>>>(
-                    $"{BaseUrl}/tickets?isCompleted={isCompletedTickets}");
+                    $"{BaseUrl}?isCompleted={isCompletedTickets}");
 
                 return tickets ?? new();
             }
@@ -31,7 +31,7 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         public async Task<ServiceResponse<bool>> CreateNewTicketAsync(TicketDTO ticket)
         {
-            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets", ticket);
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}", ticket);
 
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
@@ -44,7 +44,7 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         public async Task<ServiceResponse<bool>> UpdateTicket(TicketDTO ticket)
         {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/tickets/{ticket.Id}", ticket);
+            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/{ticket.Id}", ticket);
 
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
@@ -57,7 +57,7 @@ namespace HibaVonal.Client.Services.MaintenanceService
 
         public async Task<ServiceResponse<bool>> DeleteTicket(int ticketId)
         {
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}/tickets/{ticketId}");
+            var response = await _httpClient.DeleteAsync($"{BaseUrl}/{ticketId}");
 
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
@@ -68,9 +68,9 @@ namespace HibaVonal.Client.Services.MaintenanceService
             };
         }
 
-        public async Task<ServiceResponse<bool>> RateTicket(TicketDTO ticket)
+        public async Task<ServiceResponse<bool>> SubmitFeedback(TicketDTO ticket)
         {
-            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/tickets/{ticket.Id}/feedback", ticket);
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/{ticket.Id}/feedback", ticket);
 
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 

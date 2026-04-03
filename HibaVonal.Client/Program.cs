@@ -2,7 +2,7 @@ using Blazored.LocalStorage;
 using HibaVonal.Client;
 using HibaVonal.Client.Handlers;
 using HibaVonal.Client.Services.AuthService;
-using HibaVonal.Client.Services.MaintenanceService;
+using HibaVonal.Client.Services.StudentTicketsService;
 using HibaVonal.Client.Services.ManagementService;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -34,7 +34,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 
 // Custom services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 
 // Configure MudBlazor Snackbar settings

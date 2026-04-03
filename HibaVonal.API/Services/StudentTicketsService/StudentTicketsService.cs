@@ -5,13 +5,13 @@ using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
 
-namespace HibaVonal.API.Services.MaintenanceService
+namespace HibaVonal.API.Services.StudentTicketsService
 {
-    public class MaintenanceService : IMaintenanceService
+    public class StudentTicketsService : IStudentTicketsService
     {
         private DataContext _context;
 
-        public MaintenanceService(DataContext context)
+        public StudentTicketsService(DataContext context)
         {
             _context = context;
         }
