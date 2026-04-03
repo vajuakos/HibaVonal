@@ -1,4 +1,4 @@
-﻿@page "/maintenance/tickets"
+﻿@page "/student/tickets"
 @attribute [Authorize]
 
 <PageTitle>Hibabejelentő</PageTitle>
@@ -172,7 +172,7 @@
 
     @code {
     [Inject] NavigationManager NavigationManager { get; set; }
-    [Inject] IMaintenanceService MaintenanceService { get; set; }
+    [Inject] IStudentTicketsService StudentTicketsService { get; set; }
     [Inject] IDialogService DialogService { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
 
@@ -181,7 +181,7 @@
 
     private async Task LoadTickets()
     {
-        var response = await MaintenanceService.GetTicketsAsync(isCompletedTicketsShowing);
+        var response = await StudentTicketsService.GetTicketsAsync(isCompletedTicketsShowing);
 
         if (response.IsSuccess)
             tickets = response.Data;
@@ -202,7 +202,7 @@
 
     private void HandleCreateTicket()
     {
-        NavigationManager.NavigateTo("/maintenance/add-ticket");
+        NavigationManager.NavigateTo("/student/add-ticket");
     }
 
     private async Task UpdateTicket(TicketDTO ticketDTO)
@@ -224,7 +224,7 @@
 
         if (result != null && !result.Canceled && result.Data is TicketDTO updatedTicket)
         {
-            var response = await MaintenanceService.UpdateTicket(updatedTicket);
+            var response = await StudentTicketsService.UpdateTicket(updatedTicket);
 
             if (response.IsSuccess)
             {
@@ -254,7 +254,7 @@
 
         if (confirmed == true)
         {
-            var response = await MaintenanceService.DeleteTicket(ticketId);
+            var response = await StudentTicketsService.DeleteTicket(ticketId);
 
             if (response.IsSuccess)
             {

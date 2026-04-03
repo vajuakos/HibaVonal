@@ -68,7 +68,7 @@
 @code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
-    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+    [Inject] IStudentTicketsService StudentTicketsService { get; set; } = default!;
 
     [Inject] ISnackbar Snackbar { get; set; } = default!;
 
@@ -96,7 +96,7 @@
 
         if (_rateMudForm.IsValid)
         {
-            var dialogResult = await MaintenanceService.RateTicket(Ticket);
+            var dialogResult = await StudentTicketsService.SubmitFeedback(Ticket);
 
             Snackbar.Add(dialogResult.Message, dialogResult.IsSuccess ? Severity.Success : Severity.Error);
 

@@ -5,7 +5,7 @@
     </div>
 
     <AuthorizeView Roles="@($"{UserRoles.Student},{UserRoles.DEV}")">
-        <MudButton href="maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
+        <MudButton href="student/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
     </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.MaintenanceStaff},{UserRoles.DEV}")">

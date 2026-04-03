@@ -77,7 +77,7 @@
 @code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
-    [Inject] IMaintenanceService MaintenanceService { get; set; } = default!;
+    [Inject] IStudentTicketsService StudentTicketsService { get; set; } = default!;
 
     [Parameter] public TicketDTO Ticket { get; set; } = new();
 

@@ -1,8 +1,8 @@
 ﻿using HibaVonal.Shared.DTO;
 
-namespace HibaVonal.API.Services.MaintenanceService
+namespace HibaVonal.API.Services.StudentTicketsService
 {
-    public interface IMaintenanceService
+    public interface IStudentTicketsService
     {
         Task<ServiceResponse<List<TicketDTO>>> GetTickets(int currentUserId, bool isCompleted);
 
