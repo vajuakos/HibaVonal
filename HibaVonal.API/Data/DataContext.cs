@@ -16,6 +16,8 @@ namespace HibaVonal.API.Data
 
         public DbSet<TicketFeedback> Feedbacks { get; set; }
 
+        public DbSet<Equipment> Equipments { get; set; }
+
         override protected void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
