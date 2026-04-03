@@ -1,7 +1,6 @@
 using Blazored.LocalStorage;
 using HibaVonal.Client;
 using HibaVonal.Client.Handlers;
-using HibaVonal.Client.Services;
 using HibaVonal.Client.Services.AuthService;
 using HibaVonal.Client.Services.StudentTicketsService;
 using HibaVonal.Client.Services.ManagementService;
