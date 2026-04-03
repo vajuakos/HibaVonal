@@ -1,17 +1,23 @@
-﻿@using System.Security.Claims
-<MudAppBar Elevation="1" Fixed="true" Color="Color.Primary">
+﻿<MudAppBar Elevation="1" Fixed="true" Color="Color.Primary">
     <div @onclick="NavigateToHome" class="d-flex align-items-center">
         <MudImage Src="img/logo.png" Alt="HibaVonal Logo" Width="40" Class="mr-3" />
         <MudText Typo="Typo.h5" Class="mr-8">HibaVonal</MudText>
     </div>
 
-    <AuthorizeView>
-        <Authorized>
-            <MudButton href="maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
-            <MudButton href="/maintenance" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
-            <MudButton href="/management/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartások</MudButton>
-            <MudButton href="/users" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Felhasználók</MudButton>
-        </Authorized>
+    <AuthorizeView Roles="@($"{UserRoles.Student},{UserRoles.DEV}")">
+        <MudButton href="maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="@($"{UserRoles.MaintenanceStaff},{UserRoles.DEV}")">
+        <MudButton href="/maintenance" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="@($"{UserRoles.MaintenanceManager},{UserRoles.DEV}")">
+        <MudButton href="/management/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartások</MudButton>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="@($"{UserRoles.Admin},{UserRoles.DEV}")">
+        <MudButton href="/users" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Rendszerkezelés</MudButton>
     </AuthorizeView>
 
     <MudSpacer />
@@ -41,7 +47,7 @@
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
 
-    private async Task NavigateToHome()
+    private void NavigateToHome()
     {
         NavigationManager.NavigateTo("/");
     }

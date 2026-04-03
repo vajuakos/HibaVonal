@@ -1,5 +1,5 @@
 @page "/management/tickets"
-@attribute [Authorize(Roles = "MaintenanceManager,Admin,DEV")]
+@attribute [Authorize(Roles = $"{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
 
 <h3>Karbantartási vezető - Ticketek</h3>
 
