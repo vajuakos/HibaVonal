@@ -1,4 +1,4 @@
-﻿namespace HibaVonal.API.Models
+﻿namespace HibaVonal.API.Models.Infrastructure
 {
     public class Equipment
     {

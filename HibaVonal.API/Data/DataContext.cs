@@ -1,5 +1,6 @@
 ﻿using HibaVonal.API.Models;
 using HibaVonal.API.Models.Ticket;
+using HibaVonal.API.Models.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

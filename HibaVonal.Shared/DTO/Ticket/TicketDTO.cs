@@ -1,6 +1,6 @@
 ﻿using HibaVonal.Shared.Enum;
 
-namespace HibaVonal.Shared.DTO
+namespace HibaVonal.Shared.DTO.Ticket
 {
     public class TicketDTO
     {

@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HibaVonal.API.Data;
+using HibaVonal.API.Models.Infrastructure;
+using HibaVonal.Shared.Constants;
+using HibaVonal.Shared.DTO.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HibaVonal.API.Data;
-using HibaVonal.Shared.DTO;
-using HibaVonal.API.Models;
 
 namespace HibaVonal.API.Controllers
 {
     [Route("api/admin")]
     [ApiController]
-    public class AdministratorController : ControllerBase
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.DEV}")]
+    public class AdministratorController : ApiControllerBase
     {
         private readonly DataContext _context;
 

@@ -1,4 +1,5 @@
 ﻿using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Ticket;
 using System.Net.Http.Json;
 
 namespace HibaVonal.Client.Services.StudentTicketsService

@@ -1,6 +1,7 @@
 ﻿using HibaVonal.API.Services.StudentTicketsService;
 using HibaVonal.Shared.Constants;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Ticket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
