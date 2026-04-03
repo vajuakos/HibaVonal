@@ -1,4 +1,5 @@
 ﻿using HibaVonal.API.Services.ManagementService;
+using HibaVonal.Shared.Constants;
 using HibaVonal.Shared.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace HibaVonal.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "MaintenanceManager,Admin,DEV")]
+    [Authorize(Roles = $"{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
     public class ManagementController : ApiControllerBase
     {
         private readonly IManagementService _managementService;
