@@ -2,6 +2,7 @@
 using HibaVonal.API.Extensions;
 using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
 

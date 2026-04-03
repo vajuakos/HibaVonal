@@ -1,5 +1,4 @@
-﻿
-using HibaVonal.Shared.DTO;
+﻿using HibaVonal.Shared.DTO.Infrastructure;
 using System.Net.Http.Json;
 
 namespace HibaVonal.Client.Services.Administrator

@@ -1,4 +1,5 @@
 ﻿using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Ticket;
 
 namespace HibaVonal.Client.Services.StudentTicketsService
 {

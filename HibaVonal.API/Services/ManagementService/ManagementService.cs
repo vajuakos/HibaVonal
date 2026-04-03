@@ -1,5 +1,6 @@
 ﻿using HibaVonal.API.Data;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
 

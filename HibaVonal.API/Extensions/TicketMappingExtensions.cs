@@ -1,6 +1,5 @@
-﻿using HibaVonal.API.Models;
-using HibaVonal.API.Models.Ticket;
-using HibaVonal.Shared.DTO;
+﻿using HibaVonal.API.Models.Ticket;
+using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
 
 namespace HibaVonal.API.Extensions
