@@ -1,8 +1,9 @@
 using HibaVonal.API.Data;
 using HibaVonal.API.Models;
 using HibaVonal.API.Services.AuthService;
-using HibaVonal.API.Services.StudentTicketsService;
+using HibaVonal.API.Services.MaintenanceStaffService;
 using HibaVonal.API.Services.ManagementService;
+using HibaVonal.API.Services.StudentTicketsService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,7 @@ builder.Services.AddIdentityCore<AppUser>(options => {
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
+builder.Services.AddScoped<IMaintenanceStaffService, MaintenanceStaffService>();
 
 var app = builder.Build();
 
