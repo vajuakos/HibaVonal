@@ -19,6 +19,8 @@ namespace HibaVonal.API.Data
 
         public DbSet<Equipment> Equipments { get; set; }
 
+        public DbSet<EquipmentRequest> EquipmentRequests { get; set; }
+
         override protected void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
