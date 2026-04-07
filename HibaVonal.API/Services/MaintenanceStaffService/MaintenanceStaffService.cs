@@ -1,6 +1,8 @@
 ﻿using HibaVonal.API.Data;
+using HibaVonal.API.Models.Infrastructure;
 using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
+using HibaVonal.Shared.DTO.Infrastructure;
 using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
@@ -108,6 +110,27 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
             {
                 IsSuccess = true,
                 Message = "Hibajegy sikeresen lezárva!"
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> SubmitEquipmentRequest(EquipmentRequestDTO dto, int currentUserId)
+        {
+            var request = new EquipmentRequest
+            {
+                TicketId = dto.TicketId,
+                EquipmentId = dto.EquipmentId,
+                Quantity = dto.Quantity,
+                RequestedById = currentUserId,
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _context.EquipmentRequests.Add(request);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool>
+            {
+                IsSuccess = true,
+                Message = "Eszközigény sikeresen leadva!"
             };
         }
     }
