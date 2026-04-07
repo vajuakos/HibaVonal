@@ -1,4 +1,5 @@
 ﻿using HibaVonal.API.Data;
+using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
@@ -59,6 +60,54 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
             {
                 Data = tickets,
                 IsSuccess = true
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId, string? feedbackComment)
+        {
+            var ticket = await _context.MaintenanceTickets
+                .Include(t => t.Review)
+                .FirstOrDefaultAsync(t => t.Id == ticketId && t.AssignedToId == currentUserId);
+
+            if (ticket == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Nem található vagy nem hozzárendelt hibajegy."
+                };
+            }
+
+            ticket.Status = TicketStatus.Resolved;
+
+            if (!string.IsNullOrWhiteSpace(feedbackComment))
+            {
+                if (ticket.Review != null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        IsSuccess = false,
+                        Message = "Már létezik feedback!"
+                    };
+                }
+
+                ticket.Review = new TicketFeedback
+                {
+                    TicketId = ticket.Id,
+                    FeedbackComment = feedbackComment,
+                    FeedbackerId = currentUserId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Feedbacks.Add(ticket.Review);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool>
+            {
+                IsSuccess = true,
+                Message = "Hibajegy sikeresen lezárva!"
             };
         }
     }

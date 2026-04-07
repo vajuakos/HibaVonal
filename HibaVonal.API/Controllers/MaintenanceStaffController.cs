@@ -31,6 +31,13 @@ namespace HibaVonal.API.Controllers
         {
             return await _maintenanceStaffService.GetAssignedTickets(CurrentUserId, isCompleted);
         }
+
+        [HttpPut("tickets/{ticketId}/resolve")]
+        public async Task<ActionResult<ServiceResponse<bool>>> ResolveTicket(int ticketId, [FromBody] TicketDTO ticketDto)
+        {
+            var result = await _maintenanceStaffService.ResolveTicketAsync(ticketId, CurrentUserId, ticketDto.FeedbackComment);
+            return Ok(result);
+        }
     }
 
 }
