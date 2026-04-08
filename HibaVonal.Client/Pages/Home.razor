@@ -1,8 +1,122 @@
 ﻿@page "/"
 @attribute [Authorize]
+@inject NavigationManager NavManager
 
-<PageTitle>HibaVonal</PageTitle>
+<PageTitle>Kezdőlap</PageTitle>
 
-<div class="d-flex justify-content-center">
-    <MudImage Src="img/logo.png" Alt="HibaVonal Logo" Width="400" />
-</div>
+<style>
+    .dashboard-card {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        height: 100%;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-8px);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(0, 229, 255, 0.3);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.1);
+    }
+</style>
+
+<AuthorizeView>
+    <MudContainer MaxWidth="MaxWidth.Large" Class="pt-8 pb-16">
+            
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-12 pb-6" Style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="6">
+                <MudImage Src="img/logo.png" Alt="HibaVonal Logo" Width="60" />
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h3" Style="color: #fff; font-weight: 800; letter-spacing: -1px;">
+                        Szia, @(context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "Felhasználó")!
+                    </MudText>
+                    <MudText Typo="Typo.body1" Style="color: rgba(255, 255, 255, 0.6); font-weight: 300;">
+                        Válassz az alábbi lehetőségek közül a HibaVonal rendszerében.
+                    </MudText>
+                </MudStack>
+            </MudStack>
+                
+            <MudAvatar Color="Color.Primary" Size="Size.Large" Elevation="4">
+                <MudIcon Icon="@Icons.Material.Filled.Person" />
+            </MudAvatar>
+        </MudStack>
+
+        <MudGrid Spacing="6">
+                
+            <AuthorizeView Roles=@($"{UserRoles.Student},{UserRoles.DEV}") Context="studentCreateContext">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="4" Class="pa-6 rounded-xl dashboard-card" @onclick="@(() => NavManager.NavigateTo("/student/create-ticket"))">
+                        <MudAvatar Style="width: 70px; height: 70px; background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3);" Class="mb-6">
+                            <MudIcon Icon="@Icons.Material.TwoTone.AddCircle" Style="font-size: 2.5rem; color: #4facfe;" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; color: #ffffff;" Class="mb-2">Új hibajegy</MudText>
+                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.5); line-height: 1.5;" Class="mt-auto">
+                            Észleltél egy hibát a kollégiumban? Küldd be gyorsan és egyszerűen, hogy a karbantartók láthassák.
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="4" Class="pa-6 rounded-xl dashboard-card" @onclick="@(() => NavManager.NavigateTo("/student/tickets"))">
+                        <MudAvatar Style="width: 70px; height: 70px; background: rgba(156, 39, 176, 0.15); border: 1px solid rgba(156, 39, 176, 0.3);" Class="mb-6">
+                            <MudIcon Icon="@Icons.Material.TwoTone.FormatListBulleted" Style="font-size: 2.5rem; color: #e040fb;" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; color: #ffffff;" Class="mb-2">Saját hibajegyeim</MudText>
+                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.5); line-height: 1.5;" Class="mt-auto">
+                            Kövesd nyomon a már beküldött hibajegyeid állapotát és a karbantartók visszajelzéseit.
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </AuthorizeView>
+
+            <AuthorizeView Roles=@($"{UserRoles.MaintenanceStaff},{UserRoles.DEV}") Context="maintenanceStaffContext">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="4" Class="pa-6 rounded-xl dashboard-card" @onclick="@(() => NavManager.NavigateTo("/management/tickets"))">
+                        <MudAvatar Style="width: 70px; height: 70px; background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.3);" Class="mb-6">
+                            <MudIcon Icon="@Icons.Material.TwoTone.Engineering" Style="font-size: 2.5rem; color: #ff9800;" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; color: #ffffff;" Class="mb-2">Feladataim</MudText>
+                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.5); line-height: 1.5;" Class="mt-auto">
+                            Nyitott hibajegyek megtekintése és munkavégzés lezárása.
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </AuthorizeView>
+
+            <AuthorizeView Roles=@($"{UserRoles.MaintenanceManager},{UserRoles.DEV}") Context="managementContext">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="4" Class="pa-6 rounded-xl dashboard-card" @onclick="@(() => NavManager.NavigateTo("/management/tickets"))">
+                        <MudAvatar Style="width: 70px; height: 70px; background: rgba(0, 191, 165, 0.15); border: 1px solid rgba(0, 191, 165, 0.3);" Class="mb-6">
+                            <MudIcon Icon="@Icons.Material.TwoTone.Assignment" Style="font-size: 2.5rem; color: #00bfa5;" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; color: #ffffff;" Class="mb-2">Munkák menedzselése</MudText>
+                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.5); line-height: 1.5;" Class="mt-auto">
+                            Karbantartók feladatainak kiosztása, státuszok módosítása.
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </AuthorizeView>
+                
+            <AuthorizeView Roles=@($"{UserRoles.Admin},{UserRoles.DEV}") Context="adminContext">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="4" Class="pa-6 rounded-xl dashboard-card" @onclick="@(() => NavManager.NavigateTo("/admin/equipment"))">
+                        <MudAvatar Style="width: 70px; height: 70px; background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3);" Class="mb-6">
+                            <MudIcon Icon="@Icons.Material.TwoTone.AdminPanelSettings" Style="font-size: 2.5rem; color: #ff5252;" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; color: #ffffff;" Class="mb-2">Rendszerkezelés</MudText>
+                        <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.5); line-height: 1.5;" Class="mt-auto">
+                            Eszközök, hibatípusok, felszereltégek kezelése.
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </AuthorizeView>
+
+        </MudGrid>
+
+    </MudContainer>
+</AuthorizeView>
