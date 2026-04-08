@@ -1,5 +1,5 @@
 ﻿@page "/student/tickets"
-@attribute [Authorize]
+@attribute [Authorize(Roles = $"{UserRoles.Student},{UserRoles.DEV}")]
 
 <PageTitle>Hibabejelentő</PageTitle>
 

@@ -29,6 +29,5 @@ namespace HibaVonal.API.Models.Ticket
         public int? ReviewId { get; set; }
 
         public TicketFeedback? Review { get; set; }
-
     }
 }

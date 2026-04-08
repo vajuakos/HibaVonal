@@ -1,9 +1,4 @@
 ﻿using HibaVonal.API.Models.Ticket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HibaVonal.API.Models.Infrastructure
 {
