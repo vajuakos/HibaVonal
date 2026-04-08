@@ -57,7 +57,7 @@ namespace HibaVonal.API.Services.StudentTicketsService
             };
         }
 
-        public async Task<ServiceResponse<bool>> AddTicket(TicketDTO ticketDto, int currentUserId)
+        public async Task<ServiceResponse<bool>> CreateTicket(TicketDTO ticketDto, int currentUserId)
         {
             var ticket = ticketDto.ToEntity(currentUserId);
 

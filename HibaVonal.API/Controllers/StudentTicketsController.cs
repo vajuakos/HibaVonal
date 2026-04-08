@@ -28,7 +28,7 @@ namespace HibaVonal.API.Controllers
         [HttpPost("tickets")]
         public async Task<ServiceResponse<bool>> CreateTicket(TicketDTO ticket)
         {
-            return await _studentTicketsService.AddTicket(ticket, CurrentUserId);
+            return await _studentTicketsService.CreateTicket(ticket, CurrentUserId);
         }
 
         [HttpPut("tickets/{ticketId}")]
