@@ -57,6 +57,6 @@
         var customAuthProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
         await customAuthProvider.NotifyUserLogoutAsync();
 
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }
