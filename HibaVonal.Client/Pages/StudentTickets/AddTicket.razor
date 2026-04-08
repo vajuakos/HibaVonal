@@ -1,4 +1,5 @@
 ﻿@page "/student/add-ticket"
+@attribute [Authorize(Roles = $"{UserRoles.Student},{UserRoles.DEV}")]
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
 

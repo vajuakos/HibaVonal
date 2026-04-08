@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HibaVonal.Shared.DTO.Infrastructure
+﻿namespace HibaVonal.Shared.DTO.Infrastructure
 {
     public class EquipmentRequestDTO
     {
