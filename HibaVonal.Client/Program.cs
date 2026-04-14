@@ -3,6 +3,7 @@ using HibaVonal.Client;
 using HibaVonal.Client.Handlers;
 using HibaVonal.Client.Services.Administrator;
 using HibaVonal.Client.Services.AuthService;
+using HibaVonal.Client.Services.InfrastructureService;
 using HibaVonal.Client.Services.MaintenanceStaffService;
 using HibaVonal.Client.Services.ManagementService;
 using HibaVonal.Client.Services.StudentTicketsService;
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IMaintenanceStaffService, MaintenanceStaffService>();
+builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 
 // Configure MudBlazor Snackbar settings
 builder.Services.AddMudServices(config =>

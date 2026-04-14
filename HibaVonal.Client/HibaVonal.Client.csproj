@@ -20,4 +20,8 @@
     <ProjectReference Include="..\HibaVonal.Shared\HibaVonal.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\MaintenanceStaff\" />
+  </ItemGroup>
+
 </Project>
