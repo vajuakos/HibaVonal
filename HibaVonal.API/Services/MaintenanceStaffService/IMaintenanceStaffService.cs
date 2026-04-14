@@ -14,7 +14,7 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
     {
         Task<ServiceResponse<List<TicketDTO>>> GetAssignedTickets(int currentUserId, bool isCompleted);
 
-        Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId, string? feedbackComment);
+        Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId);
 
         Task<ServiceResponse<bool>> SubmitEquipmentRequest(EquipmentRequestDTO dto, int currentUserId);
     }
