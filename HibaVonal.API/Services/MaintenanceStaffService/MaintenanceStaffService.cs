@@ -65,10 +65,9 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
             };
         }
 
-        public async Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId, string? feedbackComment)
+        public async Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId)
         {
             var ticket = await _context.MaintenanceTickets
-                .Include(t => t.Review)
                 .FirstOrDefaultAsync(t => t.Id == ticketId && t.AssignedToId == currentUserId);
 
             if (ticket == null)
@@ -81,28 +80,6 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
             }
 
             ticket.Status = TicketStatus.Resolved;
-
-            if (!string.IsNullOrWhiteSpace(feedbackComment))
-            {
-                if (ticket.Review != null)
-                {
-                    return new ServiceResponse<bool>
-                    {
-                        IsSuccess = false,
-                        Message = "Már létezik feedback!"
-                    };
-                }
-
-                ticket.Review = new TicketFeedback
-                {
-                    TicketId = ticket.Id,
-                    FeedbackComment = feedbackComment,
-                    FeedbackerId = currentUserId,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Feedbacks.Add(ticket.Review);
-            }
 
             await _context.SaveChangesAsync();
 
