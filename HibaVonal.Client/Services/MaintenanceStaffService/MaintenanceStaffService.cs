@@ -29,12 +29,20 @@ namespace HibaVonal.Client.Services.MaintenanceStaffService
                 var result = await _httpClient.GetFromJsonAsync<ServiceResponse<List<TicketDTO>>>(
                     $"{BaseUrl}/tickets?isCompleted={isCompleted}");
 
-                return result ?? new();
+                return result ?? new ServiceResponse<List<TicketDTO>>
+                {
+                    IsSuccess = false,
+                    Message = "Nem érkezett válasz a szervertől."
+                };
             }
 
             catch
             {
-                return new();
+                return new ServiceResponse<List<TicketDTO>>
+                {
+                    IsSuccess = false,
+                    Message = "Hiba történt a hibajegyek lekérésekor."
+                };
             }
         }
 

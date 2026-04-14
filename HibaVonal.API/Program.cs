@@ -1,6 +1,7 @@
 using HibaVonal.API.Data;
 using HibaVonal.API.Models;
 using HibaVonal.API.Services.AuthService;
+using HibaVonal.API.Services.InfrastructureService;
 using HibaVonal.API.Services.MaintenanceStaffService;
 using HibaVonal.API.Services.ManagementService;
 using HibaVonal.API.Services.StudentTicketsService;
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IMaintenanceStaffService, MaintenanceStaffService>();
+builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 
 var app = builder.Build();
 
