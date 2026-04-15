@@ -17,7 +17,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-//Resgister to automatically include the JWT token in HTTP requests
+//Register to automatically include the JWT token in HTTP requests
 builder.Services.AddTransient<AuthenticationHeaderHandler>();
 
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.BaseAddress;

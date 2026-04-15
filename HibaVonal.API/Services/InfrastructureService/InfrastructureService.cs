@@ -1,14 +1,7 @@
 ﻿using HibaVonal.API.Data;
 using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.DTO.Infrastructure;
-using HibaVonal.Shared.DTO.Ticket;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HibaVonal.API.Services.InfrastructureService
 {
