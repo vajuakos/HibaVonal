@@ -21,7 +21,6 @@
                     <MudSelect T="TicketDTO"
                         Label="Hibajegy"
                         @bind-Value="selectedTicket"
-                        ToStringFunc="@(t => $"{t?.Title} (Szoba: {t?.RoomNumber})")"
                         Required="true"
                         RequiredError="Válassz hibajegyet!"
                         Variant="Variant.Outlined"
