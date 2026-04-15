@@ -32,7 +32,7 @@
 
                     <MudButton Variant="Variant.Filled"
                         Color="Color.Primary"
-                        @onclick="handleLogin">
+                        @onclick="HandleLogin">
                         Bejelentkezés
                     </MudButton>
 
@@ -47,11 +47,22 @@
 
 @code {
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] AuthenticationStateProvider authenticationStateProvider { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
 
     private LoginRequestDTO loginDTO = new();
 
-    async Task handleLogin()
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Prevent logged-in users from accessing the login page
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+            NavigationManager.NavigateTo("/");
+    }
+
+    async Task HandleLogin()
     {
         var response = await AuthService.LoginAsync(loginDTO);
 
