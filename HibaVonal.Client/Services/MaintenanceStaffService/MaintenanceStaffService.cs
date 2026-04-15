@@ -1,13 +1,7 @@
 ﻿using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.DTO.Infrastructure;
 using HibaVonal.Shared.DTO.Ticket;
-using HibaVonal.Shared.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HibaVonal.Client.Services.MaintenanceStaffService
 {

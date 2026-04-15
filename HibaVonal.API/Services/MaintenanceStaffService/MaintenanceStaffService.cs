@@ -1,16 +1,10 @@
 ﻿using HibaVonal.API.Data;
 using HibaVonal.API.Models.Infrastructure;
-using HibaVonal.API.Models.Ticket;
 using HibaVonal.Shared.DTO;
 using HibaVonal.Shared.DTO.Infrastructure;
 using HibaVonal.Shared.DTO.Ticket;
 using HibaVonal.Shared.Enum;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HibaVonal.API.Services.MaintenanceStaffService
 {
