@@ -129,7 +129,7 @@
                         <MudText Typo="Typo.body2" Color="Color.Default" Class="line-clamp-3">
                             @ticket.Description
                         </MudText>
-                        @if (!string.IsNullOrEmpty(ticket.RoomNumber.ToString()))
+                        @if (ticket.RoomNumber != null)
                         {
                             <MudChip T="string" Icon="@Icons.Material.Filled.MeetingRoom" Size="Size.Small" Class="mt-2 px-2">
                                 @ticket.RoomNumber. szoba
