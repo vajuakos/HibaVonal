@@ -1,79 +1,120 @@
 ﻿@page "/admin/equipment"
+@attribute [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.DEV}")]
+@using MudBlazor
 @inject IAdministratorService AdminService
+@inject ISnackbar Snackbar
 
-<div class="container-fluid">
-    <h4 class="mb-4">Eszközök és Hibatípusok Kezelése</h4>
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+    <MudPaper Elevation="6"
+              Class="pa-6 mx-auto"
+              Style="max-width: 1450px; background: rgba(255,255,255,0.95); color: #1f2937;">
 
-    @if (equipments == null)
-    {
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Betöltés...</span>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover border">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Eszköz neve</th>
-                        <th>Típus / Hiba kategória</th>
-                        <th>Helyiség száma</th>
-                        <th class="text-center">Műveletek</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in equipments)
-                    {
-                        <tr>
-                            <td>@item.Name</td>
-                            <td>@item.Type</td>
-                            <td>@item.RoomNumber</td>
-                            <td class="text-center">
-                                <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteItem(item.Id)">
-                                    <i class="oi oi-trash"></i> Eltávolítás
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Style="font-weight:700;">
+                Eszközök és hibatípusok kezelése
+            </MudText>
 
-        <div class="card shadow-sm mt-5">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Új eszköz vagy felszerelés hozzáadása</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Eszköz neve</label>
-                        <input @bind="newEquipment.Name" class="form-control" placeholder="Pl: Csaptelep" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Típus</label>
-                        <input @bind="newEquipment.Type" class="form-control" placeholder="Pl: Vizesblokk" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Helyiség</label>
-                        <input @bind="newEquipment.RoomNumber" class="form-control" placeholder="Pl: 204. szoba" />
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-success w-100" @onclick="SaveEquipment">
+            <MudText Typo="Typo.body1" Style="color:#4b5563;">
+                Itt tudsz új eszközt vagy felszerelést hozzáadni, illetve meglévő elemeket törölni.
+            </MudText>
+
+            <MudDivider />
+
+            @if (_isLoading)
+            {
+                <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Class="mt-4">Adatok betöltése...</MudText>
+                </MudStack>
+            }
+            else
+            {
+                <MudTable Items="equipments"
+                          Hover="true"
+                          Dense="true"
+                          Striped="true"
+                          Bordered="true"
+                          Breakpoint="Breakpoint.Md">
+
+                    <HeaderContent>
+                        <MudTh>Eszköz neve</MudTh>
+                        <MudTh>Típus / Hiba kategória</MudTh>
+                        <MudTh>Helyiség száma</MudTh>
+                        <MudTh>Műveletek</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate Context="item">
+                        <MudTd DataLabel="Eszköz neve">@item.Name</MudTd>
+                        <MudTd DataLabel="Típus / Hiba kategória">@item.Type</MudTd>
+                        <MudTd DataLabel="Helyiség száma">@item.RoomNumber</MudTd>
+                        <MudTd DataLabel="Műveletek">
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="@(() => DeleteItem(item.Id))">
+                                Eltávolítás
+                            </MudButton>
+                        </MudTd>
+                    </RowTemplate>
+
+                    <NoRecordsContent>
+                        <MudText>Nincs még rögzített eszköz.</MudText>
+                    </NoRecordsContent>
+                </MudTable>
+
+                <MudPaper Elevation="2" Class="pa-6 mt-6" Style="background:#f8fafc;">
+                    <MudText Typo="Typo.h5" Class="mb-4" Style="font-weight:600;">
+                        Új eszköz vagy felszerelés hozzáadása
+                    </MudText>
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" md="4">
+                            <MudTextField @bind-Value="newEquipment.Name"
+                                          Label="Eszköz neve"
+                                          Placeholder="Pl.: Csaptelep"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12" md="4">
+                            <MudTextField @bind-Value="newEquipment.Type"
+                                          Label="Típus"
+                                          Placeholder="Pl.: Vizesblokk"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12" md="4">
+                            <MudTextField @bind-Value="newEquipment.RoomNumber"
+                                          Label="Helyiség"
+                                          Placeholder="Pl.: 204. szoba"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          FullWidth="true" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="SaveEquipment">
                             Hozzáadás
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            }
+        </MudStack>
+    </MudPaper>
+</MudContainer>
 
 @code {
-    private List<EquipmentDTO> equipments;
+    private List<EquipmentDTO> equipments = new();
     private EquipmentDTO newEquipment = new();
+    private bool _isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,29 +123,45 @@
 
     private async Task LoadData()
     {
-        // A te saját AdministratorService-edet hívja meg
+        _isLoading = true;
         equipments = await AdminService.GetEquipmentsAsync();
+        _isLoading = false;
     }
 
     private async Task SaveEquipment()
     {
-        if (!string.IsNullOrWhiteSpace(newEquipment.Name))
+        if (string.IsNullOrWhiteSpace(newEquipment.Name))
         {
-            var success = await AdminService.AddEquipmentAsync(newEquipment);
-            if (success)
-            {
-                newEquipment = new(); // Mezők ürítése
-                await LoadData();     // Lista frissítése
-            }
+            Snackbar.Add("Az eszköz neve kötelező.", Severity.Warning);
+            return;
+        }
+
+        var success = await AdminService.AddEquipmentAsync(newEquipment);
+
+        if (success)
+        {
+            Snackbar.Add("Eszköz sikeresen hozzáadva.", Severity.Success);
+            newEquipment = new EquipmentDTO();
+            await LoadData();
+        }
+        else
+        {
+            Snackbar.Add("Az eszköz hozzáadása sikertelen volt.", Severity.Error);
         }
     }
 
     private async Task DeleteItem(int id)
     {
         var success = await AdminService.RemoveEquipmentAsync(id);
+
         if (success)
         {
+            Snackbar.Add("Eszköz sikeresen eltávolítva.", Severity.Success);
             await LoadData();
+        }
+        else
+        {
+            Snackbar.Add("Az eszköz törlése sikertelen volt.", Severity.Error);
         }
     }
 }

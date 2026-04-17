@@ -1,132 +1,161 @@
 @page "/maintenance/equipment-request"
+@page "/management/equipment-request"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using HibaVonal.Client.Services.EquipmentRequestService
+
+@attribute [Authorize(Roles = $"{UserRoles.MaintenanceStaff},{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
-
     <MudPaper Elevation="4" Class="pa-8 rounded-xl">
-
         <MudForm @ref="_addForm">
-
             <div class="d-flex align-center mb-8">
                 <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Class="mr-4" Style="width: 56px; height: 56px;">
                     <MudIcon Icon="@Icons.Material.Filled.Inventory" Size="Size.Large" />
                 </MudAvatar>
+
                 <div>
                     <MudText Typo="Typo.h5" Class="font-weight-bold">Eszközigény leadása</MudText>
-                    <MudText Typo="Typo.body2" Class="mud-text-secondary">Válaszd ki a szükséges eszközt és add meg a mennyiséget.</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                        @(_isManagerView
+                            ? "Vezetőként bármely nyitott hibajegyhez leadhatsz eszközigényt."
+                            : "Karbantartóként csak a hozzád rendelt hibajegyhez adhatsz le eszközigényt.")
+                    </MudText>
                 </div>
             </div>
 
             <MudGrid Spacing="3">
                 <MudItem xs="12">
                     <MudSelect T="TicketDTO"
-                        Label="Hibajegy"
-                        @bind-Value="selectedTicket"
-                        Required="true"
-                        RequiredError="Válassz hibajegyet!"
-                        Variant="Variant.Outlined"
-                        Dense="true"
-                        Adornment="Adornment.Start"
-                        AdornmentIcon="@Icons.Material.Filled.ReportProblem"
-                        FullWidth="true">
-
-                    @foreach (var t in tickets)
-                    {
-                        <MudSelectItem Value="@t">@t.Title (@t.RoomNumber)</MudSelectItem>
-                    }
-
+                               Label="Hibajegy"
+                               @bind-Value="selectedTicket"
+                               ToStringFunc="GetTicketDisplayText"
+                               Required="true"
+                               RequiredError="Válassz hibajegyet!"
+                               Variant="Variant.Outlined"
+                               Dense="true"
+                               Adornment="Adornment.Start"
+                               AdornmentIcon="@Icons.Material.Filled.ReportProblem"
+                               FullWidth="true">
+                        @foreach (var t in tickets)
+                        {
+                            <MudSelectItem Value="@t">@t.Title (@t.RoomNumber)</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
-                
-                <MudItem xs="12" md="9">
-                    <MudSelect T="EquipmentDTO"
-                        Label="Eszköz"
-                        @bind-Value="selectedEquipment"
-                        ToStringFunc="e => e?.Name"
-                        Required="true"
-                        RequiredError="Válassz egy eszközt!"
-                        Variant="Variant.Outlined"
-                        Dense="true"
-                        Adornment="Adornment.Start"
-                        AdornmentIcon="@Icons.Material.Filled.Build"
-                        FullWidth="true">
 
-                    @foreach (var eq in equipments)
-                    {
-                        <MudSelectItem Value="@eq">@eq.Name</MudSelectItem>
-                    }
+                <MudItem xs="12" md="8">
+                    <MudSelect T="EquipmentDTO"
+                               Label="Eszköz"
+                               @bind-Value="selectedEquipment"
+                               ToStringFunc="e => e?.Name"
+                               Required="true"
+                               RequiredError="Válassz egy eszközt!"
+                               Variant="Variant.Outlined"
+                               Dense="true"
+                               Adornment="Adornment.Start"
+                               AdornmentIcon="@Icons.Material.Filled.Build"
+                               FullWidth="true">
+                        @foreach (var eq in equipments)
+                        {
+                            <MudSelectItem Value="@eq">@eq.Name</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
 
                 <MudItem xs="12" md="4">
                     <MudNumericField T="int"
-                        Label="Mennyiség"
-                        @bind-Value="model.Quantity"
-                        Required="true"
-                        RequiredError="Kötelező!"
-                        Variant="Variant.Outlined"
-                        Min="1"
-                        Max="100"
-                        Adornment="Adornment.Start"
-                        AdornmentIcon="@Icons.Material.Filled.FormatListNumbered"
-                        FullWidth="true" />
+                                     Label="Mennyiség"
+                                     @bind-Value="model.Quantity"
+                                     Required="true"
+                                     RequiredError="Kötelező!"
+                                     Variant="Variant.Outlined"
+                                     Min="1"
+                                     Max="100"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.FormatListNumbered"
+                                     FullWidth="true" />
                 </MudItem>
-
             </MudGrid>
 
             <MudDivider Class="my-6" />
 
-                <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="3">
-                    <MudButton Variant="Variant.Text"
-                        Color="Color.Default"
-                        StartIcon="@Icons.Material.Filled.ArrowBack"
-                        OnClick="@(() => NavigationManager.NavigateTo("/maintenance/tickets"))"
-                        Class="px-6">
-                        Mégse
-                    </MudButton>
+            <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="3">
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Default"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           OnClick="GoBack"
+                           Class="px-6">
+                    Mégse
+                </MudButton>
 
-                    <MudButton Variant="Variant.Filled"
-                        Color="Color.Primary"
-                        StartIcon="@Icons.Material.Filled.Send"
-                        OnClick="HandleSubmit"
-                        Class="px-10 rounded-pill">
-                        Küldés
-                    </MudButton>
-                </MudStack>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Send"
+                           OnClick="HandleSubmit"
+                           Class="px-10 rounded-pill">
+                    Küldés
+                </MudButton>
+            </MudStack>
         </MudForm>
     </MudPaper>
 </MudContainer>
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "ticketId")]
+    public int? TicketId { get; set; }
+
     [Inject] IMaintenanceStaffService MaintenanceService { get; set; } = default!;
+    [Inject] IManagementService ManagementService { get; set; } = default!;
+    [Inject] IEquipmentRequestService EquipmentRequestService { get; set; } = default!;
     [Inject] IInfrastructureService InfrastructureService { get; set; } = default!;
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
     [Inject] ISnackbar Snackbar { get; set; } = default!;
+    [Inject] AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
-    MudForm? _addForm;
+    private MudForm? _addForm;
 
-    EquipmentDTO? selectedEquipment;
-    EquipmentRequestDTO model = new();
+    private EquipmentDTO? selectedEquipment;
+    private TicketDTO? selectedTicket;
 
-    List<EquipmentDTO> equipments = new();
+    private EquipmentRequestDTO model = new()
+    {
+        Quantity = 1
+    };
 
-    List<TicketDTO> tickets = new();
-    TicketDTO? selectedTicket;
+    private List<EquipmentDTO> equipments = new();
+    private List<TicketDTO> tickets = new();
 
+    private bool _isManagerView;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        _isManagerView =
+            user.IsInRole(UserRoles.MaintenanceManager) ||
+            user.IsInRole(UserRoles.DEV);
+
         var equipmentResponse = await InfrastructureService.GetEquipmentsAsync();
 
-            if (equipmentResponse.IsSuccess && equipmentResponse.Data != null)
-            {
-                equipments = equipmentResponse.Data;
-            }
-            else
-            {
-                Snackbar.Add(equipmentResponse.Message ?? "Nem sikerült betölteni az eszközöket.", Severity.Error);
-            }
+        if (equipmentResponse.IsSuccess && equipmentResponse.Data != null)
+        {
+            equipments = equipmentResponse.Data;
+        }
+        else
+        {
+            Snackbar.Add(
+                equipmentResponse.Message ?? "Nem sikerült betölteni az eszközöket.",
+                Severity.Error);
+        }
 
-        var ticketResponse = await MaintenanceService.GetAssignedTicketsAsync(false);
+        if (_isManagerView)
+        {
+            var ticketResponse = await ManagementService.GetTicketsAsync(false);
 
             if (ticketResponse.IsSuccess && ticketResponse.Data != null)
             {
@@ -134,29 +163,95 @@
             }
             else
             {
-                Snackbar.Add(ticketResponse.Message ?? "Nem sikerült betölteni a hibákat.", Severity.Error);
+                Snackbar.Add(
+                    ticketResponse.Message ?? "Nem sikerült betölteni a hibajegyeket.",
+                    Severity.Error);
             }
+        }
+        else
+        {
+            var ticketResponse = await MaintenanceService.GetAssignedTicketsAsync(false);
+
+            if (ticketResponse.IsSuccess && ticketResponse.Data != null)
+            {
+                tickets = ticketResponse.Data;
+            }
+            else
+            {
+                Snackbar.Add(
+                    ticketResponse.Message ?? "Nem sikerült betölteni a hibákat.",
+                    Severity.Error);
+            }
+        }
+
+        if (TicketId.HasValue)
+        {
+            selectedTicket = tickets.FirstOrDefault(t => t.Id == TicketId.Value);
+
+            if (selectedTicket == null)
+            {
+                Snackbar.Add(
+                    "A megadott hibajegy nem található vagy nem érhető el ebben a nézetben.",
+                    Severity.Warning);
+            }
+        }
     }
 
-    async Task HandleSubmit()
+    private async Task HandleSubmit()
     {
+        if (_addForm is null)
+            return;
+
         await _addForm.Validate();
 
-        if (_addForm.IsValid)
+        if (!_addForm.IsValid)
+            return;
+
+        model.TicketId = selectedTicket?.Id ?? 0;
+        model.EquipmentId = selectedEquipment?.Id ?? 0;
+
+        var result = await EquipmentRequestService.SubmitEquipmentRequestAsync(model);
+
+        Snackbar.Add(
+            result.Message ?? (result.IsSuccess ? "Sikeres művelet." : "Hiba történt."),
+            result.IsSuccess ? Severity.Success : Severity.Error);
+
+        if (result.IsSuccess)
         {
-            model.EquipmentId = selectedEquipment?.Id ?? 0;
-            model.TicketId = selectedTicket?.Id ?? 0;
-            
-            var result = await MaintenanceService.SubmitEquipmentRequestAsync(model);
-
-            Snackbar.Add(result.Message, result.IsSuccess ? Severity.Success : Severity.Error);
-
-            if (result.IsSuccess)
+            model = new EquipmentRequestDTO
             {
-                model = new();
-                selectedEquipment = null;
+                Quantity = 1
+            };
+
+            selectedEquipment = null;
+
+            if (TicketId.HasValue)
+            {
+                selectedTicket = tickets.FirstOrDefault(t => t.Id == TicketId.Value);
+            }
+            else
+            {
                 selectedTicket = null;
             }
         }
+    }
+
+    private void GoBack()
+    {
+        if (_isManagerView)
+        {
+            NavigationManager.NavigateTo("/management/tickets");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/maintenance/tickets");
+        }
+    }
+    private string GetTicketDisplayText(TicketDTO? ticket)
+    {
+        if (ticket is null)
+            return string.Empty;
+
+        return $"{ticket.Title} ({ticket.RoomNumber})";
     }
 }
