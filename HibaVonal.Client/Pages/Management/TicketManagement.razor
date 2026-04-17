@@ -1,76 +1,208 @@
 @page "/management/tickets"
 @attribute [Authorize(Roles = $"{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
+@using HibaVonal.Shared.DTO.User
+@using MudBlazor
 
-<h3>Karbantartási vezető - Ticketek</h3>
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+    <MudPaper Elevation="6"
+              Class="pa-6 mx-auto"
+              Style="max-width: 1450px; background: rgba(255,255,255,0.95); color: #1f2937;">
 
-@if (!string.IsNullOrWhiteSpace(_message))
-{
-    <p>@_message</p>
-}
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Style="font-weight:700;">
+                Karbantartási vezető - Ticketek
+            </MudText>
 
-@if (_tickets == null)
-{
-    <p>Töltés...</p>
-}
-else if (!_tickets.Any())
-{
-    <p>Nincs megjeleníthető ticket.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Cím</th>
-                <th>Szoba</th>
-                <th>Állapot</th>
-                <th>Létrehozó</th>
-                <th>Hozzárendelve</th>
-                <th>Művelet</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ticket in _tickets)
+            <MudText Typo="Typo.body1" Style="color:#4b5563;">
+                Itt tudod a hibajegyek státuszát módosítani, illetve karbantartóhoz rendelni őket.
+            </MudText>
+
+            <MudDivider />
+
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+                <MudSwitch T="bool"
+                           Value="_showCompleted"
+                           ValueChanged="OnShowCompletedChanged"
+                           Color="Color.Primary"
+                           Label="Elvégzett hibajegyek megjelenítése" />
+
+                <MudText Typo="Typo.body2" Style="color:#6b7280;">
+                    Aktuális nézet:
+                    <strong>@(_showCompleted ? "Elvégzett hibajegyek" : "Nyitott / folyamatban lévő hibajegyek")</strong>
+                </MudText>
+            </MudStack>
+
+            @if (!string.IsNullOrWhiteSpace(_message))
             {
-                <tr>
-                    <td>@ticket.Id</td>
-                    <td>@ticket.Title</td>
-                    <td>@ticket.RoomNumber</td>
-                    <td>
-                        <InputSelect @bind-Value="ticket.Status">
-                            @foreach (var status in Enum.GetValues<TicketStatus>())
-                            {
-                                <option value="@status">@status.ToDisplayString()</option>
-                            }
-                        </InputSelect>
-                    </td>
-                    <td>@ticket.CreatedByEmail</td>
-                    <td>@(ticket.AssignedToEmail ?? "Nincs hozzárendelve")</td>
-                    <td>
-                        <button @onclick="() => SaveStatus(ticket)">Mentés</button>
-                    </td>
-                </tr>
+                <MudAlert Severity="@_messageSeverity" Variant="Variant.Filled" Dense="true">
+                    @_message
+                </MudAlert>
             }
-        </tbody>
-    </table>
-}
+
+            @if (_isLoading)
+            {
+                <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Class="mt-4">Adatok betöltése...</MudText>
+                </MudStack>
+            }
+            else if (_tickets == null || !_tickets.Any())
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    Nincs megjeleníthető ticket ebben a nézetben.
+                </MudAlert>
+            }
+            else
+            {
+                <MudTable Items="_tickets"
+                          Hover="true"
+                          Dense="true"
+                          Striped="true"
+                          Bordered="true"
+                          Breakpoint="Breakpoint.Md">
+
+                    <HeaderContent>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Cím</MudTh>
+                        <MudTh>Szoba</MudTh>
+                        <MudTh>Állapot</MudTh>
+                        <MudTh>Létrehozó</MudTh>
+                        <MudTh>Karbantartó</MudTh>
+                        <MudTh>Műveletek</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate Context="ticket">
+                        <MudTd DataLabel="Id">@ticket.Id</MudTd>
+
+                        <MudTd DataLabel="Cím">@ticket.Title</MudTd>
+
+                        <MudTd DataLabel="Szoba">@ticket.RoomNumber</MudTd>
+
+                        <MudTd DataLabel="Állapot" Style="min-width: 180px;">
+                            <MudSelect T="TicketStatus"
+                                       @bind-Value="ticket.Status"
+                                       Dense="true"
+                                       Variant="Variant.Outlined">
+                                @foreach (var status in Enum.GetValues<TicketStatus>())
+                                {
+                                    <MudSelectItem T="TicketStatus" Value="@status">
+                                        @GetStatusText(status)
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudTd>
+
+                        <MudTd DataLabel="Létrehozó">@ticket.CreatedByEmail</MudTd>
+
+                        <MudTd DataLabel="Karbantartó" Style="min-width: 260px;">
+                            <MudSelect T="int?"
+                                       @bind-Value="ticket.AssignedToId"
+                                       Dense="true"
+                                       Variant="Variant.Outlined"
+                                       Clearable="true">
+                                @foreach (var staff in _maintenanceStaffUsers)
+                                {
+                                    <MudSelectItem T="int?" Value="@((int?)staff.Id)">
+                                        @staff.Email
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+
+                            <MudText Typo="Typo.caption" Class="mt-1" Style="color:#6b7280;">
+                                Jelenleg: @(ticket.AssignedToEmail ?? "Nincs hozzárendelve")
+                            </MudText>
+                        </MudTd>
+
+                        <MudTd DataLabel="Műveletek" Style="min-width: 430px;">
+                            <MudStack Row="true" Spacing="2">
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           Style="min-width: 120px;"
+                                           OnClick="@(() => SaveStatus(ticket))">
+                                    Státusz mentése
+                                </MudButton>
+
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Secondary"
+                                           Size="Size.Small"
+                                           Style="min-width: 120px;"
+                                           Disabled="@(!ticket.AssignedToId.HasValue)"
+                                           OnClick="@(() => SaveAssignment(ticket))">
+                                    Kiosztás mentése
+                                </MudButton>
+
+                                <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Info"
+                                           Size="Size.Small"
+                                           Style="min-width: 130px;"
+                                           OnClick="@(() => GoToEquipmentRequest(ticket.Id))">
+                                    Eszközigény
+                                </MudButton>
+                            </MudStack>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+        </MudStack>
+    </MudPaper>
+</MudContainer>
 
 @code {
-    [Inject] IManagementService ManagerService { get; set; }
+    [Inject] IManagementService ManagerService { get; set; } = default!;
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
 
     private List<TicketDTO>? _tickets;
+    private List<UserListItemDTO> _maintenanceStaffUsers = new();
     private string? _message;
+    private Severity _messageSeverity = Severity.Info;
+    private bool _isLoading = true;
+    private bool _showCompleted = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadTickets();
+        await LoadPageData(clearMessage: true);
     }
 
-    private async Task LoadTickets()
+    private void GoToEquipmentRequest(int ticketId)
     {
-        var result = await ManagerService.GetTicketsAsync(false);
-        _tickets = result.Data ?? new List<TicketDTO>();
+        NavigationManager.NavigateTo($"/management/equipment-request?ticketId={ticketId}");
+    }
+
+    private async Task LoadPageData(bool clearMessage = false)
+    {
+        _isLoading = true;
+
+        if (clearMessage)
+        {
+            _message = null;
+        }
+
+        var ticketResult = await ManagerService.GetTicketsAsync(_showCompleted);
+        _tickets = ticketResult.Data ?? new List<TicketDTO>();
+
+        if (!ticketResult.IsSuccess)
+        {
+            _message = ticketResult.Message;
+            _messageSeverity = Severity.Error;
+        }
+
+        var staffResult = await ManagerService.GetMaintenanceStaffUsersAsync();
+        _maintenanceStaffUsers = staffResult.Data ?? new List<UserListItemDTO>();
+
+        if (!staffResult.IsSuccess)
+        {
+            _message = staffResult.Message;
+            _messageSeverity = Severity.Error;
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task OnShowCompletedChanged(bool value)
+    {
+        _showCompleted = value;
+        await LoadPageData(clearMessage: true);
     }
 
     private async Task SaveStatus(TicketDTO ticket)
@@ -78,10 +210,42 @@ else
         var result = await ManagerService.UpdateTicketStatusAsync(ticket.Id, ticket.Status);
 
         _message = result.Message;
+        _messageSeverity = result.IsSuccess ? Severity.Success : Severity.Error;
 
         if (result.IsSuccess)
         {
-            await LoadTickets();
+            await LoadPageData();
         }
+    }
+
+    private async Task SaveAssignment(TicketDTO ticket)
+    {
+        if (!ticket.AssignedToId.HasValue)
+        {
+            _message = "Először válassz ki egy karbantartót.";
+            _messageSeverity = Severity.Warning;
+            return;
+        }
+
+        var result = await ManagerService.AssignTicketAsync(ticket.Id, ticket.AssignedToId.Value);
+
+        _message = result.Message;
+        _messageSeverity = result.IsSuccess ? Severity.Success : Severity.Error;
+
+        if (result.IsSuccess)
+        {
+            await LoadPageData();
+        }
+    }
+
+    private string GetStatusText(TicketStatus status)
+    {
+        return status switch
+        {
+            TicketStatus.New => "Új",
+            TicketStatus.InProgress => "Folyamatban",
+            TicketStatus.Resolved => "Elvégzett",
+            _ => status.ToString()
+        };
     }
 }

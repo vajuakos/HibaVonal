@@ -5,11 +5,11 @@
     </div>
 
     <AuthorizeView Roles="@($"{UserRoles.Student},{UserRoles.DEV}")">
-        <MudButton href="student/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
+		<MudButton href="/student/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Ticketek</MudButton>
     </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.MaintenanceStaff},{UserRoles.DEV}")">
-        <MudButton href="/maintenance" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
+		<MudButton href="/maintenance/tickets" Variant="Variant.Text" Color="Color.Inherit" Class="ml-2">Karbantartás</MudButton>
     </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.MaintenanceManager},{UserRoles.DEV}")">

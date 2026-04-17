@@ -1,7 +1,6 @@
 ﻿using HibaVonal.API.Services.MaintenanceStaffService;
 using HibaVonal.Shared.Constants;
 using HibaVonal.Shared.DTO;
-using HibaVonal.Shared.DTO.Infrastructure;
 using HibaVonal.Shared.DTO.Ticket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,13 +33,6 @@ namespace HibaVonal.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("equipment-request")]
-        [Authorize(Roles = $"{UserRoles.MaintenanceStaff},{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
-        public async Task<ActionResult<ServiceResponse<bool>>> SubmitEquipmentRequest([FromBody] EquipmentRequestDTO dto)
-        {
-            var result = await _maintenanceStaffService.SubmitEquipmentRequest(dto, CurrentUserId);
-            return Ok(result);
-        }
     }
 
 }

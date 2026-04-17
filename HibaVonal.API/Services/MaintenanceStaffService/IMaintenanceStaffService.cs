@@ -1,5 +1,4 @@
 ﻿using HibaVonal.Shared.DTO;
-using HibaVonal.Shared.DTO.Infrastructure;
 using HibaVonal.Shared.DTO.Ticket;
 
 namespace HibaVonal.API.Services.MaintenanceStaffService
@@ -9,7 +8,5 @@ namespace HibaVonal.API.Services.MaintenanceStaffService
         Task<ServiceResponse<List<TicketDTO>>> GetAssignedTickets(int currentUserId, bool isCompleted);
 
         Task<ServiceResponse<bool>> ResolveTicketAsync(int ticketId, int currentUserId);
-
-        Task<ServiceResponse<bool>> SubmitEquipmentRequest(EquipmentRequestDTO dto, int currentUserId);
     }
 }
