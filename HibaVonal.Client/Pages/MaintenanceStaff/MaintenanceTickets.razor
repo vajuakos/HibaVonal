@@ -1,0 +1,236 @@
+@page "/maintenance/tickets"
+@attribute [Authorize(Roles = $"{UserRoles.Maintenance},{UserRoles.DEV}")]
+
+<PageTitle>Karbantartási hibajegyek</PageTitle>
+
+<MudPaper Elevation="2"
+          Class="pa-4 mb-6 rounded-xl border-solid border-2 mud-border-primary"
+          Style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);">
+
+    <MudStack Row="true"
+              Justify="Justify.SpaceBetween"
+              AlignItems="AlignItems.Center"
+              Wrap="Wrap.Wrap"
+              Spacing="4">
+        
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+            <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium">
+                <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" />
+            </MudAvatar>
+
+            <div>
+                <MudText Typo="Typo.h5" Class="font-weight-bold">
+                    Karbantartói felület
+                </MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary text-uppercase font-weight-bold">
+                    Kollégiumi karbantartás
+                </MudText>
+            </div>
+        </MudStack>
+
+        
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+
+            <MudPaper Elevation="0"
+                      Class="px-4 py-1 rounded-pill d-flex align-center">
+
+                <MudSwitch T="bool"
+                           Value="isCompleted"
+                           ValueChanged="OnCompletedChanged"
+                           ThumbIcon="@(isCompleted ? Icons.Material.Filled.DoneAll : Icons.Material.Filled.PendingActions)"
+                           Color="@(isCompleted ? Color.Success : Color.Warning)"
+                           Label="@(isCompleted ? "Lezárt hibák" : "Folyamatban lévő hibák")" />
+            </MudPaper>
+
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.BuildCircle"
+                       OnClick="GoToEquipmentRequest">
+                Eszközigénylés
+            </MudButton>
+
+        </MudStack>
+
+    </MudStack>
+</MudPaper>
+
+
+<MudGrid Justify="Justify.Center">
+    @if (tickets.Count == 0)
+    {
+        <MudItem xs="12">
+        <div class="d-flex justify-center align-center w-100" style="min-height: 350px;">
+
+            <MudPaper Elevation="0"
+                      Class="pa-8 d-flex flex-column align-center justify-center rounded-xl"
+                      Style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-width: 450px; width: 100%;">
+
+                <MudIcon Icon="@(isCompleted ? Icons.Material.Filled.Feedback : Icons.Material.Filled.SelfImprovement)"
+                         Style="@($"font-size: 5rem; color: {(isCompleted ? "rgba(76, 175, 80, 0.8)" : "rgba(255, 255, 255, 0.9)")};")"
+                         Class="mb-4" />
+
+                <MudText Typo="Typo.h5">
+                    @(isCompleted ? "Még nincs lezárt hibajegy" : "Nincsenek folyamatban lévő hibajegyek")
+                </MudText>
+
+                <MudText Typo="Typo.body1">
+                    @(isCompleted
+                        ? "Itt jelennek meg a befejezett és lezárt hibák."
+                        : "Jelenleg nincs javítandó feladat.")
+                </MudText>
+            </MudPaper>
+
+        </div>
+        </MudItem>
+    }
+    else
+    {
+       @foreach (var ticket in tickets)
+       {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudCard Elevation="4" Class="rounded-lg mud-width-full" Style="transition: transform 0.2s; cursor: pointer;"
+                         onmouseover="this.style.transform='translateY(-4px)'"
+                         onmouseout="this.style.transform='translateY(0)'">
+
+                    <MudCardHeader Class="pb-0">
+                        <CardHeaderContent>
+                            <div class="d-flex justify-space-between align-start">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.caption"
+                                            Color="Color.Primary"
+                                            Class="fw-bold text-uppercase">
+                                        #@ticket.Id • @ticket.CreatedAt.ToString("yyyy.MM.dd")
+                                    </MudText>
+                                    <MudText Typo="Typo.h6"
+                                            Class="mud-text-secondary mt-n1"
+                                            Style="font-weight: 700;">
+                                        @ticket.Title
+                                    </MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small"
+                                         Variant="Variant.Text"
+                                         Color="@ColorHelper.GetStatusColor(ticket.Status)"
+                                         Class="ml-2">
+                                    @TicketStatusExtensions.ToDisplayString(ticket.Status)
+                                </MudChip>
+                            </div>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+
+                    <MudCardContent Style="height: 100px; overflow-y: auto;">
+                        <MudText Typo="Typo.body2" Color="Color.Default" Class="line-clamp-3">
+                            @ticket.Description
+                        </MudText>
+                        @if (ticket.RoomNumber != null)
+                        {
+                            <MudChip T="string"
+                                    Icon="@Icons.Material.Filled.MeetingRoom"
+                                    Size="Size.Small"
+                                    Class="mt-2 px-2">
+                                @ticket.RoomNumber. szoba
+                            </MudChip>
+                        }
+                        @if (ticket.Rating != null)
+                        {
+                            <MudChip T="string"
+                                    Color="Color.Warning"
+                                    Size="Size.Small"
+                                    Class="mt-2 px-2">
+                                <MudIcon Icon="@Icons.Material.Filled.Star" Class="mr-1" />
+                                @ticket.Rating
+                            </MudChip>
+                        }
+                    </MudCardContent>
+
+                    <MudDivider DividerType="DividerType.Middle" Class="mx-4 my-1" />
+
+                    <MudCardActions Class="d-flex justify-end px-4 pb-3">
+                        @if (!isCompleted)
+                        {
+                            <MudButton StartIcon="@Icons.Material.Filled.CheckCircle"
+                                Size="Size.Small"
+                                Variant="Variant.Filled"
+                                Color="Color.Success"
+                                OnClick="@(() => MarkAsCompleted(ticket.Id))">
+                                Javítva
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">
+                                Lezárt
+                            </MudChip>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+       }
+    }
+</MudGrid>
+
+
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] IMaintenanceStaffService MaintenanceService { get; set; } = default!;
+    [Inject] ISnackbar Snackbar { get; set; } = default!;
+    [Inject] IDialogService DialogService { get; set; } = default!;
+    
+    List<TicketDTO> tickets = new();
+    bool isCompleted = false;
+
+    private async Task OnCompletedChanged(bool value)
+    {
+        isCompleted = value;
+        await LoadTickets();
+    }
+
+    private async Task LoadTickets()
+    {
+        var response = await MaintenanceService.GetAssignedTickets(isCompleted);
+
+        if (response.IsSuccess)
+        {
+            tickets = response.Data;
+        }
+        else
+        {
+            Snackbar.Add(response.Message ?? "Hiba történt", Severity.Error);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTickets();
+    }
+
+    private void GoToEquipmentRequest()
+    {
+        NavigationManager.NavigateTo("/maintenance/add-equipment-request");
+    }
+
+    private async Task MarkAsCompleted(int ticketId)
+    {
+        bool? confirmed = await DialogService.ShowMessageBox(
+            "Hibajegy lezárása",
+            "Biztosan lezártnak jelölöd ezt a hibajegyet?",
+            yesText: "Lezárás",
+            cancelText: "Mégse");
+        
+        if (confirmed == true)
+        {
+            var response = await MaintenanceService.ResolveTicketAsync(ticketId);
+            
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.Message ?? "Hibajegy lezárva!", Severity.Success);
+                await LoadTickets();
+            }
+            else
+            {
+                Snackbar.Add(response.Message ?? "Hiba történt", Severity.Error);
+            }
+        }
+    }
+}
