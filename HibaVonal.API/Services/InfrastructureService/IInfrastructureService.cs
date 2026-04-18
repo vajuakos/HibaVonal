@@ -6,5 +6,7 @@ namespace HibaVonal.API.Services.InfrastructureService
     public interface IInfrastructureService
     {
         Task<ServiceResponse<List<EquipmentDTO>>> GetEquipmentsAsync();
+
+        Task<ServiceResponse<bool>> SubmitEquipmentRequestAsync(EquipmentRequestDTO dto, int currentUserId);
     }
 }

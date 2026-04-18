@@ -37,5 +37,18 @@ namespace HibaVonal.Client.Services.InfrastructureService
                 };
             }
         }
+
+        public async Task<ServiceResponse<bool>> SubmitEquipmentRequestAsync(EquipmentRequestDTO dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/equipment-request", dto);
+
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+
+            return result ?? new ServiceResponse<bool>
+            {
+                IsSuccess = false,
+                Message = "Hiba történt az eszközigény leadásakor."
+            };
+        }
     }
 }

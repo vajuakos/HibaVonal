@@ -5,7 +5,6 @@ using HibaVonal.API.Services.InfrastructureService;
 using HibaVonal.API.Services.MaintenanceStaffService;
 using HibaVonal.API.Services.ManagementService;
 using HibaVonal.API.Services.StudentTicketsService;
-using HibaVonal.API.Services.EquipmentRequestService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +63,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IMaintenanceStaffService, MaintenanceStaffService>();
-builder.Services.AddScoped<IEquipmentRequestService, EquipmentRequestService>();
 builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 
 var app = builder.Build();

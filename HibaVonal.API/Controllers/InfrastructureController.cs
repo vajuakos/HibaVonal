@@ -25,5 +25,13 @@ namespace HibaVonal.API.Controllers
         {
             return await _infrastructureService.GetEquipmentsAsync();
         }
+
+        [HttpPost("equipment-request")]
+        [Authorize(Roles = $"{UserRoles.MaintenanceStaff},{UserRoles.MaintenanceManager},{UserRoles.DEV}")]
+        public async Task<ActionResult<ServiceResponse<bool>>> SubmitEquipmentRequest([FromBody] EquipmentRequestDTO dto)
+        {
+            var result = await _infrastructureService.SubmitEquipmentRequestAsync(dto, CurrentUserId);
+            return Ok(result);
+        }
     }
 }
