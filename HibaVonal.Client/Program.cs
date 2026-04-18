@@ -7,7 +7,6 @@ using HibaVonal.Client.Services.InfrastructureService;
 using HibaVonal.Client.Services.MaintenanceStaffService;
 using HibaVonal.Client.Services.ManagementService;
 using HibaVonal.Client.Services.StudentTicketsService;
-using HibaVonal.Client.Services.EquipmentRequestService;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -42,7 +41,6 @@ builder.Services.AddScoped<IStudentTicketsService, StudentTicketsService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IMaintenanceStaffService, MaintenanceStaffService>();
-builder.Services.AddScoped<IEquipmentRequestService, EquipmentRequestService>();
 builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 
 // Configure MudBlazor Snackbar settings
