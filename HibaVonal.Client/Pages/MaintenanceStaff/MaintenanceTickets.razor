@@ -1,5 +1,5 @@
 @page "/maintenance/tickets"
-@attribute [Authorize(Roles = $"{UserRoles.Maintenance},{UserRoles.DEV}")]
+@attribute [Authorize(Roles = $"{UserRoles.MaintenanceStaff},{UserRoles.DEV}")]
 
 <PageTitle>Karbantartási hibajegyek</PageTitle>
 
@@ -188,7 +188,7 @@
 
     private async Task LoadTickets()
     {
-        var response = await MaintenanceService.GetAssignedTickets(isCompleted);
+        var response = await MaintenanceService.GetAssignedTicketsAsync(isCompleted);
 
         if (response.IsSuccess)
         {
