@@ -101,9 +101,9 @@
                                 <MudChip T="string"
                                          Size="Size.Small"
                                          Variant="Variant.Text"
-                                         Color="@GetStatusColor(ticket.Status)"
+                                         Color="@ColorHelper.GetStatusColor(ticket.Status)"
                                          Class="ml-2">
-                                    @GetStatusText(ticket.Status)
+                                    @TicketStatusExtensions.ToDisplayString(ticket.Status)
                                 </MudChip>
                             </div>
                         </CardHeaderContent>
@@ -221,27 +221,5 @@
         {
             Snackbar.Add(response.Message ?? "A hibajegy lezárása sikertelen.", Severity.Error);
         }
-    }
-
-    private static string GetStatusText(TicketStatus status)
-    {
-        return status switch
-        {
-            TicketStatus.New => "Új",
-            TicketStatus.InProgress => "Folyamatban",
-            TicketStatus.Resolved => "Elvégzett",
-            _ => status.ToString()
-        };
-    }
-
-    private static Color GetStatusColor(TicketStatus status)
-    {
-        return status switch
-        {
-            TicketStatus.New => Color.Warning,
-            TicketStatus.InProgress => Color.Info,
-            TicketStatus.Resolved => Color.Success,
-            _ => Color.Default
-        };
     }
 }

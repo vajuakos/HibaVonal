@@ -1,8 +1,9 @@
 ﻿@page "/admin/equipment"
 @attribute [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.DEV}")]
-@using MudBlazor
 @inject IAdministratorService AdminService
 @inject ISnackbar Snackbar
+
+<PageTitle>Admin</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
     <MudPaper Elevation="6"
