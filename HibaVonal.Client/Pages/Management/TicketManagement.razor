@@ -24,7 +24,7 @@
                            Value="_showCompleted"
                            ValueChanged="OnShowCompletedChanged"
                            Color="Color.Primary"
-                           Label=@(_showCompleted ? "Elvégzett hibajegyek" : "Folyamatban lévő hibajegyek") />
+                           Label="@(_showCompleted ? "Elvégzett hibajegyek" : "Folyamatban lévő hibajegyek")" />
 
                 <MudText Typo="Typo.body2" Style="color:#6b7280;">
                     Aktuális nézet:
@@ -121,8 +121,8 @@
                             </MudStack>
                         </MudTd>
 
-                        <MudTd DataLabel="Műveletek" Style="min-width: 430px;">
-                            <MudStack Row="true" Spacing="2">
+                        <MudTd DataLabel="Műveletek" Style="min-width: 560px;">
+                            <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
                                 <MudButton Variant="Variant.Filled"
                                            Color="Color.Primary"
                                            Size="Size.Small"
@@ -134,7 +134,7 @@
                                 <MudButton Variant="Variant.Filled"
                                            Color="Color.Secondary"
                                            Size="Size.Small"
-                                           Style="min-width: 120px;"
+                                           Style="min-width: 140px;"
                                            Disabled="@(!ticket.AssignedToId.HasValue || ticket.Status == TicketStatus.Resolved)"
                                            OnClick="@(() => SaveAssignment(ticket))">
                                     Hozzárendelés mentése
@@ -146,6 +146,14 @@
                                            Style="min-width: 130px;"
                                            OnClick="@(() => NavigationManager.NavigateTo($"/infrastructure/add-equipment-request?ticketId={ticket.Id}"))">
                                     Eszközigény
+                                </MudButton>
+
+                                <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Default"
+                                           Size="Size.Small"
+                                           Style="min-width: 100px;"
+                                           OnClick="@(() => ShowDescription(ticket))">
+                                    Leírás
                                 </MudButton>
                             </MudStack>
                         </MudTd>
@@ -159,6 +167,7 @@
 @code {
     [Inject] IManagementService ManagerService { get; set; } = default!;
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] IDialogService DialogService { get; set; } = default!;
 
     private List<TicketDTO>? _tickets;
     private List<UserListItemDTO> _maintenanceStaffUsers = new();
@@ -239,5 +248,25 @@
         {
             await LoadPageData();
         }
+    }
+
+    private async Task ShowDescription(TicketDTO ticket)
+    {
+        var parameters = new DialogParameters<TicketDescriptionDialog>
+        {
+            { x => x.Ticket, ticket }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        await DialogService.ShowAsync<TicketDescriptionDialog>(
+            "Hibajegy leírása",
+            parameters,
+            options);
     }
 }
