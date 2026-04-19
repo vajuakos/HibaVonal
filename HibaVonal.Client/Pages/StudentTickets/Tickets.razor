@@ -149,7 +149,7 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteTicket(ticket.Id))" />
                             </MudTooltip>
                         }
-                        else
+                        else if (ticket.Status == TicketStatus.Resolved)
                         {
                             <MudStack Row AlignItems="AlignItems.Center">
                                 

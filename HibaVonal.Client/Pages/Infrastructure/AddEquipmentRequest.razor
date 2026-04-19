@@ -36,7 +36,7 @@
                                FullWidth="true">
                         @foreach (var t in tickets)
                         {
-                            <MudSelectItem Value="@t">@($"{t.Title} ({t.RoomNumber}. szoba)")</MudSelectItem>
+                            <MudSelectItem Value="@t">@($"#{t.Id} • {t.Title} • ({t.RoomNumber}. szoba)")</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -55,7 +55,7 @@
                                FullWidth="true">
                         @foreach (var eq in equipments)
                         {
-                            <MudSelectItem Value="@eq">@eq.Name</MudSelectItem>
+                            <MudSelectItem Value="@eq">@($"#{eq.Id} • {eq.Name}")</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -81,7 +81,7 @@
                 <MudButton Variant="Variant.Text"
                            Color="Color.Default"
                            StartIcon="@Icons.Material.Filled.ArrowBack"
-                           OnClick="GoBack"
+                           OnClick="RedirectToTickets"
                            Class="px-6">
                     Mégse
                 </MudButton>
@@ -124,15 +124,15 @@
     private List<TicketDTO> tickets = new();
 
     private bool _isManagerView;
+    private bool _isMaintenanceStaffView;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        _isManagerView =
-            user.IsInRole(UserRoles.MaintenanceManager) ||
-            user.IsInRole(UserRoles.DEV);
+        _isManagerView = user.IsInRole(UserRoles.MaintenanceManager);
+        _isMaintenanceStaffView = user.IsInRole(UserRoles.MaintenanceStaff);
 
         var equipmentResponse = await InfrastructureService.GetEquipmentsAsync();
 
@@ -217,34 +217,26 @@
             }
         }
 
-        await Task.Delay(2000);
-
-        if (_isManagerView)
-        {
-            NavigationManager.NavigateTo("/management/tickets");
-        }
-        else
-        {
-            NavigationManager.NavigateTo("/maintenance/tickets");
-        }
+        RedirectToTickets();
     }
 
-    private void GoBack()
+    private void RedirectToTickets()
     {
         if (_isManagerView)
         {
             NavigationManager.NavigateTo("/management/tickets");
         }
-        else
+        else if (_isMaintenanceStaffView)
         {
             NavigationManager.NavigateTo("/maintenance/tickets");
         }
     }
+
     private string GetTicketDisplayText(TicketDTO? ticket)
     {
         if (ticket is null)
             return string.Empty;
 
-        return $"{ticket.Title} ({ticket.RoomNumber}. szoba)";
+        return $"#{ticket.Id} • {ticket.Title} • ({ticket.RoomNumber}. szoba)";
     }
 }
