@@ -9,7 +9,13 @@
         
         <div class="px-16">
 
-            <MudText Align="Align.Center" Typo="Typo.h5" Class="pb-4">Bejelentkezés</MudText>
+            <div class="d-flex flex-column align-center mb-6">
+                <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large" Class="mb-3 elevation-2">
+                    <MudIcon Icon="@Icons.Material.Filled.LockPerson" Size="Size.Medium" />
+                </MudAvatar>
+                <MudText Typo="Typo.h5" Class="font-weight-bold">Bejelentkezés</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary mt-1">Kérjük, add meg az adataidat!</MudText>
+            </div>
 
             <MudForm>
 
@@ -49,6 +55,7 @@
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
     [Inject] AuthenticationStateProvider authenticationStateProvider { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
+    [Inject] ISnackbar _snackbar { get; set; } = default!;
 
     private LoginRequestDTO loginDTO = new();
 
@@ -67,8 +74,8 @@
         var response = await AuthService.LoginAsync(loginDTO);
 
         if (response.IsSuccess)
-        {
             NavigationManager.NavigateTo("/");
-        }
+        else
+            _snackbar.Add("Sikertelen bejelentkezés!", Severity.Error);
     }
 }
