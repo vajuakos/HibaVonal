@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using HibaVonal.Shared.DTO.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor;
 using System.Net.Http.Json;
 
 namespace HibaVonal.Client.Services.AuthService
@@ -11,17 +10,12 @@ namespace HibaVonal.Client.Services.AuthService
         private const string BaseUrl = "api/auth";
 
         private readonly ILocalStorageService _localStorage;
-        private readonly ISnackbar _snackbar;
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
 
-        public AuthService(ILocalStorageService localStorage,
-                            ISnackbar snackbar,
-                            HttpClient httpClient,
-                            AuthenticationStateProvider authStateProvider)
+        public AuthService(ILocalStorageService localStorage, HttpClient httpClient, AuthenticationStateProvider authStateProvider)
         {
             _localStorage = localStorage;
-            _snackbar = snackbar;
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
         }
@@ -43,7 +37,6 @@ namespace HibaVonal.Client.Services.AuthService
                     return result;
                 }
 
-                _snackbar.Add("Sikertelen bejelentkezés!", Severity.Error);
                 return new LoginResponseDTO { IsSuccess = false, Token = null };
             }
 
